@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for graph-dangling. The one agent is in a module (so it is not itself an orphan); its prose ref to foo-reviewer is the dangler under test (BR-DEP-003).",
+  "componentKinds": ["agents"],
+  "modules": {
+    "review": {
+      "description": "Single-agent fixture with a dangling prose handoff.",
+      "components": {
+        "agents": ["source-reviewer"]
+      }
+    }
+  }
+}

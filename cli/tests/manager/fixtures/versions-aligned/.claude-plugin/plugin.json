@@ -1,0 +1,13 @@
+{
+  "name": "forge",
+  "version": "0.1.0",
+  "description": "Versions-aligned fixture plugin manifest. version agrees with VERSION (0.1.0) and package.json (0.1.0) — the aligned tree against which validate-registry reports no VERSION drift.",
+  "author": {
+    "name": "Gonzalo Alcala"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["claude-code", "harness", "fixture"],
+  "mcpServers": {},
+  "commands": ["./commands/"],
+  "skills": ["./skills/"]
+}

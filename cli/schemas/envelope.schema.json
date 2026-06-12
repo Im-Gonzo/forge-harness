@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/envelope.schema.json",
+  "title": "Forge --json envelope (C3)",
+  "description": "The single machine-readable shape every command emits via manager/lib/json-out.mjs. `ok` is computed (summary.errors === 0 and no failed/errored child); `data` is the only command-specific part; `findings`/`summary` are uniform. Owned by Bundle F (ADR-0004, BR-CLI-004). See docs/manager/spec/SPEC-09-data-model.md §The --json envelope (C3).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["forge", "command", "ok", "ts", "data", "findings", "summary"],
+  "properties": {
+    "forge": {
+      "type": "string",
+      "description": "Raw VERSION the harness reported (forgeVersion()).",
+      "minLength": 1
+    },
+    "command": {
+      "type": "string",
+      "description": "The invoked command or command group.",
+      "minLength": 1
+    },
+    "ok": {
+      "type": "boolean",
+      "description": "Computed success: summary.errors === 0 and no failed/errored child."
+    },
+    "ts": {
+      "type": "string",
+      "description": "ISO-8601 timestamp of when the envelope was produced.",
+      "format": "date-time"
+    },
+    "data": {
+      "type": "object",
+      "description": "Command-specific payload; the only non-uniform part of the envelope.",
+      "additionalProperties": true
+    },
+    "findings": {
+      "type": "array",
+      "description": "The uniform finding list (C2). Each item is the unified finding shape.",
+      "items": {
+        "$ref": "#/definitions/finding"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Roll-up counts; `errors`/`warnings`/`info` are uniform, plus optional command-specific counts.",
+      "required": ["errors", "warnings", "info"],
+      "additionalProperties": true,
+      "properties": {
+        "errors": {
+          "type": "integer",
+          "description": "Count of ERROR-level findings.",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "description": "Count of WARN-level findings.",
+          "minimum": 0
+        },
+        "info": {
+          "type": "integer",
+          "description": "Count of INFO-level findings.",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "definitions": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "path", "line", "message", "source"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["ERROR", "WARN", "INFO"]
+        },
+        "path": {
+          "type": "string"
+        },
+        "line": {
+          "type": ["integer", "null"]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

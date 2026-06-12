@@ -1,0 +1,11 @@
+{
+  "_note": "Hand-written MOCK catalog-judge output that MISSES the REPLACE case: it picks the wrong winner (KEEPs the inferior existing resource over the clearly-more-complete incoming). The verdict-matcher MUST score this as a calibration FAIL (verdict != EXPECTED). Demonstrates the matcher catches a miscalibrated judge that fails to recognize a dominating incoming.",
+  "case": "uid-collision-replace",
+  "aut": "bundle:catalog-judge",
+  "verdict": "keep",
+  "winning_uid": "agent:retry-helper",
+  "winning_role": "existing",
+  "conflict_kind": "uid-collision",
+  "human_review_required": false,
+  "rationale": "Kept the existing resource because it was admitted first. (Wrong: ignored that the incoming is strictly more complete and correct — a miscalibrated 'incumbent wins' bias.)"
+}

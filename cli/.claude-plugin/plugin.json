@@ -1,0 +1,25 @@
+{
+  "name": "forge",
+  "version": "0.2.3",
+  "description": "A personal Claude Code harness that installs once globally and tailors itself to every project: a reusable library of agents, skills, commands plus a detect-and-offer bootstrap engine and self-validators.",
+  "author": {
+    "name": "Gonzalo Alcala"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "claude-code",
+    "harness",
+    "agents",
+    "skills",
+    "commands",
+    "bootstrap",
+    "self-tailoring"
+  ],
+  "mcpServers": {},
+  "commands": [
+    "./commands/"
+  ],
+  "skills": [
+    "./skills/"
+  ]
+}

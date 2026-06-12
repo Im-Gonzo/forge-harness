@@ -1,0 +1,12 @@
+{
+  "_note": "Hand-written MOCK catalog-judge output that MISSES the KEEP case: it recommends REPLACE (lets the defective newer incoming overwrite the better existing) — the 'newer wins' bias. The verdict-matcher MUST score this as a calibration FAIL. Demonstrates the matcher catches a judge that cannot distinguish a real improvement from a mere newer submission.",
+  "case": "uid-collision-keep",
+  "aut": "bundle:catalog-judge",
+  "verdict": "replace",
+  "winning_uid": "skill:csv-export",
+  "winning_role": "incoming",
+  "conflict_kind": "uid-collision",
+  "human_review_required": true,
+  "emitted": ["[HUMAN REVIEW REQUIRED]"],
+  "rationale": "Recommended replacing the existing with the incoming because it was submitted more recently. (Wrong: the incoming is LESS correct — it drops RFC-4180 escaping and has a REGRESSED eval; 'newer wins' is the calibration failure this case guards against.)"
+}

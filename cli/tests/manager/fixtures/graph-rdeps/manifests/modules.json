@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for graph-rdeps. All three agents are in one module so they are NOT orphans; the rdeps/deps behaviour is driven purely by the prose routes-to edges (B->A, C->A). Exercises BR-DEP-005.",
+  "componentKinds": ["agents"],
+  "modules": {
+    "review": {
+      "description": "Shared-target review fixture (A used by B and C).",
+      "components": {
+        "agents": ["a-reviewer", "b-reviewer", "c-reviewer"]
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+# forge — a zero-dependency Claude Code harness plugin.
+# (No npm deps by design; these are defensive.)
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# Logs / temp
+*.log
+*.tmp
+*.orig
+
+# Test-generated registries inside fixtures are regenerable; never commit them.
+tests/manager/fixtures/**/.forge/
+
+# NOTE: .forge/registry.json and .forge/registry.log.jsonl ARE tracked on purpose —
+# the harness self-hosts its own manager registry (ADR-0003, git-tracked truth).
+# Machine-local manager state (telemetry, fleet, eval-runs) lives in ~/.claude/forge/,
+# which is outside this repository.

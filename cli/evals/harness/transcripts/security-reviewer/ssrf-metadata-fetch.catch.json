@@ -1,0 +1,14 @@
+{
+  "_note": "Hand-written MOCK security-reviewer output for the planted-SSRF fixture. The real reviewer run is a LIVE model call, NOT executed here; this transcript exists only to exercise the deterministic code grader offline. A CATCHING transcript: cites line 42 at HIGH and names the SSRF via the closed phrase set. gradeReviewerCase(...) MUST PASS.",
+  "case": "ssrf-metadata-fetch",
+  "aut": "agent:security-reviewer",
+  "findings": [
+    {
+      "file": "app.py",
+      "line": 42,
+      "severity": "HIGH",
+      "title": "SSRF: user-controlled URL fetched with no allowlist",
+      "body": "The /preview handler passes the attacker-controlled ?next= value straight into requests.get with no scheme or host validation. A caller can point it at 169.254.169.254 (cloud metadata) and read instance credentials. Confine the destination to an allowlist of permitted hosts and reject internal/link-local ranges."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for graph-alltypes. Each named component yields a `member-of` edge component->module. The `eval` module names the bundle, the skill, the agent and the reviewer; the `rules-common` module names the rule. Together with profiles.json (selects) and the bundle/agent/rule prose+frontmatter, this exercises every BR-DEP-001 edge type.",
+  "componentKinds": ["agents", "skills", "rules", "bundles"],
+  "modules": {
+    "eval": {
+      "description": "Names the bundle + its frontmatter-pointed components (member-of edges).",
+      "components": {
+        "bundles": ["eval-judge"],
+        "skills": ["run-eval"],
+        "agents": ["graph-reviewer", "secondary-reviewer"]
+      }
+    },
+    "rules-common": {
+      "description": "Names the rule the agent applies.",
+      "components": {
+        "rules": ["citation-rule"]
+      }
+    }
+  }
+}

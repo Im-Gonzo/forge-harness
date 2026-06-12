@@ -1,0 +1,13 @@
+{
+  "_note": "Deterministically-collected admission signals for the KEEP pair. Both injection/repo-safety signals GREEN; the discriminator is on the merit axes + the eval result, where the EXISTING wins. The judge must not pick the incoming just because it is newer.",
+  "a": {
+    "injection_auditor": "GREEN",
+    "repo_safety_auditor": "GREEN",
+    "eval": { "status": "GREEN", "catch_pow_k": 1.0, "clean_pow_k": 1.0 }
+  },
+  "b": {
+    "injection_auditor": "GREEN",
+    "repo_safety_auditor": "GREEN",
+    "eval": { "status": "REGRESSED", "catch_pow_k": 0.6, "clean_pow_k": 0.8, "note": "field-escaping case fails" }
+  }
+}

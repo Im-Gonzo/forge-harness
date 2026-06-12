@@ -1,0 +1,11 @@
+{
+  "uid": "skill:csv-export",
+  "kind": "skill",
+  "role": "incoming",
+  "contentHash": "sha256:dddd4444incoming0000000000000000000000000000000000000000000000dd",
+  "title": "csv-export — dump a table to CSV (in-memory)",
+  "body": "Read the entire result set into a list, then join each row with commas and join rows with newlines. No quoting or escaping. Returns one big string.",
+  "completeness": "partial — no streaming (buffers the whole table), no header row",
+  "correctness": "defective — a field containing a comma, quote, or newline corrupts the row (no RFC-4180 quoting)",
+  "quality": "thin"
+}

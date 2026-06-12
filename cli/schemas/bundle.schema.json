@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/bundle.schema.json",
+  "title": "Forge context-bundle frontmatter",
+  "description": "Schema for the YAML frontmatter of a .claude/bundles/*.md context bundle. Derived from the REQUIRED_KEYS and invariants (B-1..B-4) enforced by bundle-lint. The 16 required keys must be present; invariants is a non-empty subset of 1..10; human_gate is a boolean. Pointer resolution on disk (B-2) is checked by the linter, not expressible here.",
+  "type": "object",
+  "required": [
+    "id", "title", "version", "status", "work_type",
+    "invariants", "adrs", "spec_sections", "br_ids", "conformance",
+    "modules", "skill", "agent", "dod_ref", "invisible_20", "human_gate"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique bundle identifier (slug).",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable bundle title.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "description": "Bundle revision number.",
+      "minimum": 1
+    },
+    "status": {
+      "type": "string",
+      "description": "Lifecycle status, e.g. active, draft, archived.",
+      "minLength": 1
+    },
+    "work_type": {
+      "type": "string",
+      "description": "The recurring class of slice this bundle serves. Tenancy/RLS, core write-path, and v1->v2 migration work-types require human_gate: true.",
+      "minLength": 1
+    },
+    "invariants": {
+      "type": "array",
+      "description": "Non-empty subset of the project's 10 invariants, referenced by integer (1..10).",
+      "items": { "type": "integer", "minimum": 1, "maximum": 10 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "adrs": {
+      "type": "array",
+      "description": "Referenced ADRs (pointers only; content stays COLD).",
+      "items": {
+        "type": "object",
+        "required": ["id", "path"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^ADR-\\d+$" },
+          "path": { "type": "string", "minLength": 1 },
+          "why": { "type": "string" }
+        }
+      }
+    },
+    "spec_sections": {
+      "type": "array",
+      "description": "Referenced spec files and the relevant sections within them.",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "sections": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "br_ids": {
+      "type": "array",
+      "description": "Business-rule IDs this bundle implements; each must exist in the BR catalog.",
+      "items": { "type": "string", "pattern": "^BR-[A-Z]+-\\d+$" }
+    },
+    "conformance": {
+      "type": "array",
+      "description": "Conformance assertions, typically spec-section references.",
+      "items": { "type": "string" }
+    },
+    "modules": {
+      "type": "array",
+      "description": "The code modules this bundle touches.",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "skill": {
+      "type": "string",
+      "description": "Primary harness skill (path under .claude/) that drives this work.",
+      "minLength": 1
+    },
+    "secondary_skill": {
+      "type": "string",
+      "description": "Optional secondary harness skill (path under .claude/)."
+    },
+    "agent": {
+      "type": "string",
+      "description": "Primary implementer agent (path under .claude/).",
+      "minLength": 1
+    },
+    "reviewer": {
+      "type": "string",
+      "description": "Optional reviewer agent (path under .claude/)."
+    },
+    "additional_reviewers": {
+      "type": "array",
+      "description": "Optional extra reviewer agents (paths under .claude/).",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "dod_ref": {
+      "type": "string",
+      "description": "Definition-of-Done reference, file path optionally followed by #anchor.",
+      "minLength": 1
+    },
+    "invisible_20": {
+      "type": "array",
+      "description": "The invisible-20% defense: the non-obvious rules that must hold but are easy to miss.",
+      "items": {
+        "type": "object",
+        "required": ["id", "rule"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "rule": { "type": "string", "minLength": 1 },
+          "check": { "type": "string" },
+          "refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "human_gate": {
+      "type": "boolean",
+      "description": "Whether this slice requires a human gate. Must be true for tenancy/RLS, core write-path, and v1->v2 migration work-types."
+    },
+    "backlog_slices": {
+      "type": "array",
+      "description": "Optional: backlog slice(s) this bundle serves.",
+      "items": { "type": "string" }
+    },
+    "acceptance_gates": {
+      "type": "array",
+      "description": "Optional: the slice's acceptance gates.",
+      "items": { "type": "string" }
+    },
+    "release_blocking_gates": {
+      "type": "array",
+      "description": "Optional: gates that block release if red.",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/tailoring.schema.json",
+  "title": "Forge project tailoring (.forge/tailoring.json)",
+  "description": "Per-active-root project state: the project's TAILORING OVERLAYS — per-adopted-resource modifiers layered ON TOP of an entry in the composition (ADR-0019). A TAILORED entry is keyed by the pair (uid, sourceId): `uid` is the resource uid \"<kind>:<id>\" (ADR-0005) and `sourceId` is the source it was adopted from, or null for the library-local copy — the SAME identity the composition uses, so only an ADOPTED resource may be tailored (the operator validates against .forge/composition.json and never widens that gate). An OVERLAY is a RECORDED INTENTION: { type, detail }, where type ∈ pin|override|layer|gate|fork|disable. Overlays are NOT applied to real .claude/ files here — application is deferred to Slice 5 (compose --write). The CLI folds the overlays over the base catalog record to compute a deterministic RESOLVED PREVIEW (a display-only VIEW: model/residency/activation/body/status/version); it never mutates the library or any file outside this store. Owned by manager/tailor.mjs (forge tailor list|add|remove). Reads/writes go through manager/lib/store.mjs (readJson / writeJsonAtomic); writes are ADDITIVE and never destructive (add records/replaces one overlay; remove drops matching overlays), preview by default and written only on --apply (the file is created on first --apply). This file is a SEPARATE additive store beside the composition — it does NOT modify .forge/composition.json's schema. It lives UNDER the active project root, not in the git-tracked library.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "tailored"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "On-disk schema tag for this file.",
+      "enum": ["forge.tailoring.v1"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the tailoring operator."
+    },
+    "tailored": {
+      "type": "array",
+      "description": "The adopted resources this project has tailored. Each entry is the pair (uid, sourceId) plus its overlays. An (uid, sourceId) absent here is UNTAILORED (tracks its source). Order is not significant; entries SHOULD be unique on (uid, sourceId) (the operator dedups and sorts on write — by uid, then sourceId). An entry whose resource is no longer ADOPTED (an orphan) is REPORTED (WARN) and dropped from the listed set, but is NEVER deleted from this file — removal is always an explicit `forge tailor remove`.",
+      "items": {
+        "$ref": "#/definitions/tailoredEntry"
+      }
+    }
+  },
+  "definitions": {
+    "tailoredEntry": {
+      "type": "object",
+      "description": "One tailored resource, identified by the pair (uid, sourceId) — the SAME identity the composition uses (ADR-0019). The resource MUST be ADOPTED (present in .forge/composition.json) to be tailored. The same uid adopted from the library (sourceId === null) and from a source are two DISTINCT entries, each with its own overlays.",
+      "additionalProperties": false,
+      "required": ["uid", "sourceId", "overlays"],
+      "properties": {
+        "uid": {
+          "$ref": "#/definitions/uid"
+        },
+        "sourceId": {
+          "$ref": "#/definitions/sourceId"
+        },
+        "overlays": {
+          "type": "array",
+          "description": "The overlays layered on this entry, in record order. A resource MAY carry multiple overlays. Idempotent dedupe per BR-CAT-016: pin/override/disable/fork keep at most ONE per type (a second add of that type replaces the prior detail); layer/gate MAY repeat but are deduped by the pair (type, detail). The operator folds these over the base record to compute the resolved preview (BR-CAT-015); they are never applied to real .claude/ files here (Slice 5).",
+          "items": {
+            "$ref": "#/definitions/overlay"
+          }
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "description": "One tailoring overlay — a RECORDED INTENTION, not an applied change. `type` selects the modifier; `detail` is a short, type-specific string (see the per-type semantics in BR-CAT-014). `detail` is REQUIRED but MAY be an empty string for fork/disable (where it is optional, e.g. \"body detached\").",
+      "additionalProperties": false,
+      "required": ["type", "detail"],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/overlayType"
+        },
+        "detail": {
+          "type": "string",
+          "description": "The type-specific overlay detail. pin: a version, e.g. \"v3.2.0\". override: a frontmatter field change \"field → value\", e.g. \"model → opus\" or \"criticality → safety\". layer: a fragment layered on top, e.g. \"+ project rule fragment\". gate: a conditional activation, e.g. \"paths: src/**\". fork: body detached for local edits (detail optional, e.g. \"body detached\" — MAY be \"\"). disable: the resource is turned off (detail optional — MAY be \"\"). Unknown/unparseable detail leaves the base value and yields an INFO finding at resolve time."
+        }
+      }
+    },
+    "overlayType": {
+      "type": "string",
+      "description": "The overlay kind: pin (lock a version) | override (change a frontmatter field, \"field → value\") | layer (layer a fragment on top of the body) | gate (conditional activation, e.g. a path glob) | fork (detach the body for local edits) | disable (turn the resource off). See BR-CAT-014 for the folding semantics each contributes to the resolved preview.",
+      "enum": ["pin", "override", "layer", "gate", "fork", "disable"]
+    },
+    "uid": {
+      "type": "string",
+      "description": "A resource uid \"<kind>:<id>\": the singular registry kind (agent|skill|command|rule|hook|bundle|validator|mcp|meta-test|engine) and the resource id, joined by a single colon (ADR-0005 / the registry record).",
+      "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9._-]*$",
+      "minLength": 3
+    },
+    "sourceId": {
+      "description": "The source the tailored resource was adopted from: the source id (manifests/sources.json#sources[].id), or null for the library-local copy (an owned in-tree record, source === null, ADR-0017). MUST match an ADOPTED (uid, sourceId) pair in .forge/composition.json.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A source id (manifests/sources.json#sources[].id).",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "minLength": 1
+        },
+        {
+          "type": "null",
+          "description": "The library-local copy (source === null)."
+        }
+      ]
+    }
+  }
+}

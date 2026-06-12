@@ -1,0 +1,17 @@
+{
+  "_note": "Hand-written MOCK catalog-judge output for the uid-collision KEEP case. A MATCHING transcript: emits the EXPECTED verdict 'keep' (the EXISTING dominates), names the surviving uid, cites all axes + both signals. No human gate (keep stays within the judge's authority). The verdict-matcher MUST score this as a calibration PASS.",
+  "case": "uid-collision-keep",
+  "aut": "bundle:catalog-judge",
+  "verdict": "keep",
+  "winning_uid": "skill:csv-export",
+  "winning_role": "existing",
+  "losing_role": "incoming",
+  "conflict_kind": "uid-collision",
+  "human_review_required": false,
+  "rationale": "Same uid, two bodies — mirror of the replace case, opposite winner. The EXISTING dominates: it streams (constant memory) and quotes/escapes fields per RFC-4180, with a GREEN eval; the INCOMING buffers the whole table and emits unescaped fields (a correctness defect that corrupts any field containing a comma/quote/newline), with a REGRESSED eval (catch^k=0.6). Security signals both GREEN, so the discriminator is merit + eval, and the existing wins. Verdict KEEP — the incoming is dropped from admission. The judge did NOT default to 'newer wins'.",
+  "evidence": {
+    "uids": ["skill:csv-export", "skill:csv-export"],
+    "hashes": ["sha256:cccc3333existing0000000000000000000000000000000000000000000000cc", "sha256:dddd4444incoming0000000000000000000000000000000000000000000000dd"],
+    "signals_relied_on": ["injection-auditor", "repo-safety-auditor", "eval"]
+  }
+}

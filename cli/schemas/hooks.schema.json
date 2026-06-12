@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/hooks.schema.json",
+  "title": "Claude Code plugin hooks.json",
+  "description": "Minimal schema for a Claude Code plugin hooks file. The top level may wrap the event map under a \"hooks\" key (with a $schema line) or be the event map directly. Each event key maps to an array of matcher groups; each group lists command hooks. Modeled on the standard Claude Code plugin hooks.json structure.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "hooks": { "$ref": "#/definitions/eventMap" },
+    "SessionStart": { "$ref": "#/definitions/matcherGroupArray" },
+    "SessionEnd": { "$ref": "#/definitions/matcherGroupArray" },
+    "PreToolUse": { "$ref": "#/definitions/matcherGroupArray" },
+    "PostToolUse": { "$ref": "#/definitions/matcherGroupArray" },
+    "PostToolUseFailure": { "$ref": "#/definitions/matcherGroupArray" },
+    "PreCompact": { "$ref": "#/definitions/matcherGroupArray" },
+    "Stop": { "$ref": "#/definitions/matcherGroupArray" },
+    "SubagentStop": { "$ref": "#/definitions/matcherGroupArray" },
+    "Notification": { "$ref": "#/definitions/matcherGroupArray" },
+    "UserPromptSubmit": { "$ref": "#/definitions/matcherGroupArray" }
+  },
+  "definitions": {
+    "eventMap": {
+      "type": "object",
+      "description": "Map of event name -> matcher-group array. Used when hooks are nested under a top-level \"hooks\" key.",
+      "additionalProperties": false,
+      "properties": {
+        "SessionStart": { "$ref": "#/definitions/matcherGroupArray" },
+        "SessionEnd": { "$ref": "#/definitions/matcherGroupArray" },
+        "PreToolUse": { "$ref": "#/definitions/matcherGroupArray" },
+        "PostToolUse": { "$ref": "#/definitions/matcherGroupArray" },
+        "PostToolUseFailure": { "$ref": "#/definitions/matcherGroupArray" },
+        "PreCompact": { "$ref": "#/definitions/matcherGroupArray" },
+        "Stop": { "$ref": "#/definitions/matcherGroupArray" },
+        "SubagentStop": { "$ref": "#/definitions/matcherGroupArray" },
+        "Notification": { "$ref": "#/definitions/matcherGroupArray" },
+        "UserPromptSubmit": { "$ref": "#/definitions/matcherGroupArray" }
+      }
+    },
+    "matcherGroupArray": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/matcherGroup" }
+    },
+    "matcherGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hooks"],
+      "properties": {
+        "matcher": {
+          "type": "string",
+          "description": "Tool-name matcher, e.g. \"Bash\", \"Edit|Write\", or \"*\". Omit for events without a tool target."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what this group does."
+        },
+        "id": {
+          "type": "string",
+          "description": "Stable identifier for the group."
+        },
+        "hooks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/hook" }
+        }
+      }
+    },
+    "hook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "command"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["command"],
+          "description": "Hook type; command hooks run a shell command."
+        },
+        "command": {
+          "type": "string",
+          "description": "The command to execute.",
+          "minLength": 1
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Timeout in seconds.",
+          "minimum": 0
+        },
+        "async": {
+          "type": "boolean",
+          "description": "When true, the hook runs without blocking tool execution."
+        }
+      }
+    }
+  }
+}

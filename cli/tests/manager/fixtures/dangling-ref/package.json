@@ -1,0 +1,6 @@
+{
+  "name": "dangling-ref-fixture",
+  "version": "0.1.0",
+  "private": true,
+  "_note": "FIXTURE. Version aligned with VERSION and plugin.json so validate-registry emits NO version-triple-drift WARN — the ONLY advisory finding is the PLANTED dangling ghost-reviewer ref under test (retargeted EVAL-DEP-001)."
+}

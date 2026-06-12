@@ -1,0 +1,15 @@
+{
+  "_note": "Hand-written MOCK catalog-judge output for the NEAR-DUP BOTH case. A MATCHING transcript: recognizes the dedup near-dup flag as a FALSE POSITIVE (the two resources are engine-specific and mutually exclusive) and emits the EXPECTED verdict 'both' — no uid wins or loses. The verdict-matcher MUST score this as a calibration PASS.",
+  "case": "near-dup-both",
+  "aut": "bundle:catalog-judge",
+  "verdict": "both",
+  "winning_uid": null,
+  "conflict_kind": "near-dup",
+  "human_review_required": false,
+  "rationale": "The dedup stage flagged these as a near-dup on a 0.91 similarity score driven by shared migration boilerplate. On the merits they are genuinely DISTINCT: A is Postgres-specific (CREATE INDEX CONCURRENTLY, transactional DDL rollback) and B is MySQL-specific (online DDL, explicitly NO transactional DDL — forward-only compensation). Neither subsumes the other; a project on one engine needs exactly one of them. The near-dup flag was a FALSE POSITIVE — verdict BOTH, admit both, no winner/loser. Both security + eval signals GREEN.",
+  "evidence": {
+    "uids": ["rule:pg-migrations", "rule:mysql-migrations"],
+    "hashes": ["sha256:eeee5555distincta00000000000000000000000000000000000000000000ee", "sha256:ffff6666distinctb00000000000000000000000000000000000000000000ff"],
+    "signals_relied_on": ["injection-auditor", "repo-safety-auditor", "eval"]
+  }
+}

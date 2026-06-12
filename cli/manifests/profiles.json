@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "_note": "DESIGN ARTIFACT (Phase 1). A profile is a named module set. The composer picks ONE base profile from the project profile (bootstrap/profile-project) then may add/drop modules based on detected facts. Every module listed here must exist in modules.json (validate-manifests enforces this).",
+  "defaultProfile": "generic",
+  "profiles": {
+    "generic": {
+      "description": "Stack-agnostic baseline. Used when the profiler can't confidently classify the stack.",
+      "modules": [
+        "core",
+        "rules-common",
+        "review",
+        "memory",
+        "hooks-quality"
+      ]
+    },
+    "python-fastapi": {
+      "description": "Python service: FastAPI/Pydantic, pytest, ruff, mypy, Postgres.",
+      "modules": [
+        "core",
+        "rules-common",
+        "review",
+        "memory",
+        "hooks-quality",
+        "python",
+        "database",
+        "eval"
+      ]
+    },
+    "next-ts": {
+      "description": "TypeScript front end: Next.js, eslint, vitest, tsc.",
+      "modules": [
+        "core",
+        "rules-common",
+        "review",
+        "memory",
+        "hooks-quality",
+        "typescript"
+      ]
+    },
+    "python-next-fullstack": {
+      "description": "Python/FastAPI core + Next.js UI + Postgres, spec-driven with context bundles and the autonomy ladder.",
+      "modules": [
+        "core",
+        "rules-common",
+        "review",
+        "memory",
+        "hooks-quality",
+        "python",
+        "typescript",
+        "database",
+        "eval",
+        "context-bundles",
+        "orchestration",
+        "security"
+      ]
+    },
+    "security": {
+      "description": "Security-heavy posture on top of the generic baseline.",
+      "modules": [
+        "core",
+        "rules-common",
+        "review",
+        "memory",
+        "hooks-quality",
+        "security"
+      ]
+    },
+    "research-tooling": {
+      "description": "Research / experimentation workspace: notebooks, scratch tools, mixed small apps. Generic baseline plus context bundles and orchestration; stack modules (python/typescript/eval/loops) arrive via moduleSelectionRules from detected facts.",
+      "modules": [
+        "core",
+        "rules-common",
+        "review",
+        "memory",
+        "hooks-quality",
+        "context-bundles",
+        "orchestration"
+      ]
+    }
+  },
+  "moduleSelectionRules": {
+    "_note": "Hints the composer applies on top of the base profile, keyed off profile-project.json facts. Documented in docs/BOOTSTRAP.md. Rules on facts.* read MATERIALIZED facts (code on disk); rules on facts.intended.* read the spec-aware HINT inferred from doc/spec prose, so a spec-first project whose code does not yet exist still gets nudged toward the right modules. intended-keyed rules are a weaker signal than materialized ones; the composer should report when it adds a module on a spec hint alone.",
+    "add": [
+      {
+        "when": "facts.database == 'postgres'",
+        "module": "database"
+      },
+      {
+        "when": "facts.hasTests == true",
+        "module": "eval"
+      },
+      {
+        "when": "facts.hasTests == true",
+        "module": "loops"
+      },
+      {
+        "when": "facts.languages includes 'python'",
+        "module": "python"
+      },
+      {
+        "when": "facts.languages includes 'typescript'",
+        "module": "typescript"
+      },
+      {
+        "when": "facts.intended.languages includes 'python'",
+        "module": "python"
+      },
+      {
+        "when": "facts.intended.languages includes 'typescript'",
+        "module": "typescript"
+      },
+      {
+        "when": "facts.intended.frameworks includes 'next'",
+        "module": "typescript"
+      },
+      {
+        "when": "facts.intended.database == 'postgres'",
+        "module": "database"
+      }
+    ]
+  }
+}

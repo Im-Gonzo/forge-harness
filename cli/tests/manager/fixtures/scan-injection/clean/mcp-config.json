@@ -1,0 +1,15 @@
+{
+  "name": "weather-mcp",
+  "description": "An MCP server that returns the current weather for a city.",
+  "command": "node",
+  "args": ["./server.mjs"],
+  "env": {
+    "WEATHER_API_BASE": "https://api.weather.example.com"
+  },
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Look up the weather for a given city name."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "_note": "Hand-written MOCK NOISY security-reviewer output that mis-flags the allowlisted fetch (line 62) as SSRF — a false positive on a clean_trap. gradeReviewerCase(...) MUST FAIL (fp=1). Demonstrates the grader catches a noisy reviewer.",
+  "case": "clean-allowlisted-fetch",
+  "aut": "agent:security-reviewer",
+  "findings": [
+    {
+      "file": "app.py",
+      "line": 62,
+      "severity": "HIGH",
+      "title": "SSRF: outbound request to a caller-named host",
+      "body": "requests.post sends to a host derived from the ?to= parameter."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+name: CI
+
+# Forge self-validation. "Forge validates Forge" (docs/METHOD.md §10): no asset
+# ships that fails the self-validators, and CI asserts that load-bearing governance
+# prose is PRESENT in the agents/skills/rules (a missing Pre-Report Gate is a
+# failing build). Two jobs:
+#   validate — asset SHAPE   (lint/run-all.mjs --strict)
+#   meta     — asset BEHAVIOR (tests/run-meta.mjs — the governance-prose contracts)
+#
+# Staged: this runs once `forge/` becomes a git repo and is pushed to GitHub.
+
+on:
+  push:
+    branches: [main, 'release/**']
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+# Avoid duplicate concurrent runs on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege: the whole workflow only needs to read the checkout.
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate assets (self-validators)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: '20.x'
+
+      # Forge is zero-dependency. If a package.json ever appears, install without
+      # executing lifecycle scripts (supply-chain hardening).
+      - name: Install (no lifecycle scripts)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            echo "no package-lock.json — Forge is zero-dependency, skipping install"
+          fi
+
+      - name: Run self-validators (strict)
+        run: node lint/run-all.mjs --strict
+
+  meta:
+    name: Meta-tests (governance-prose contracts)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: '20.x'
+
+      - name: Install (no lifecycle scripts)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            echo "no package-lock.json — Forge is zero-dependency, skipping install"
+          fi
+
+      - name: Run behavioral meta-tests
+        run: node tests/run-meta.mjs

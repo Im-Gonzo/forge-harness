@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/profile-project.schema.json",
+  "title": "Forge project profile (profile-project.json)",
+  "description": "Deterministic stack facts emitted by bootstrap/profile-project.mjs into <project>/.claude/profile-project.json. Pure facts, no composition decisions. The composer reads these against manifests/ to pick a profile and modules. See docs/BOOTSTRAP.md §Profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["languages", "packageManager", "frameworks", "testRunner", "lintFormat", "monorepo", "commands", "docs", "hasTests", "intended"],
+  "properties": {
+    "hasTests": {
+      "type": "boolean",
+      "description": "True when a test runner / test files are detected. Consumed by manifests/profiles.json moduleSelectionRules (facts.hasTests == true -> add the eval module)."
+    },
+    "intended": {
+      "type": "object",
+      "description": "Spec-aware HINT: the intended stack inferred from prose in the detected doc/spec dirs + root doc files (README/docs/AGENTS.md/CLAUDE.md). ALWAYS emitted (like hasTests). Kept STRICTLY separate from the materialized languages/frameworks/database facts and never merged into them — it lets the composer nudge toward the right profile for a spec-first project whose code does not yet exist. Empty arrays / null when nothing is found. Consumed by manifests/profiles.json moduleSelectionRules (facts.intended.*).",
+      "additionalProperties": false,
+      "required": ["languages", "frameworks", "database"],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "description": "Languages mentioned in spec/doc prose, e.g. [\"python\", \"typescript\"].",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "frameworks": {
+          "type": "array",
+          "description": "Frameworks/libraries mentioned in spec/doc prose, e.g. [\"fastapi\", \"pydantic\", \"next\"].",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "database": {
+          "type": ["string", "null"],
+          "description": "Database mentioned in spec/doc prose, e.g. \"postgres\"; null when none found."
+        }
+      }
+    },
+    "_meta": {
+      "type": "object",
+      "description": "Provenance/evidence emitted by the profiler (underscore-prefixed, non-spec). Free-form; the composer ignores it for decisions.",
+      "additionalProperties": true
+    },
+    "languages": {
+      "type": "array",
+      "description": "Detected source languages, e.g. [\"python\", \"typescript\"].",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "packageManager": {
+      "type": "object",
+      "description": "Per-ecosystem package manager, e.g. { \"python\": \"uv\", \"node\": \"pnpm\" }.",
+      "additionalProperties": { "type": "string" }
+    },
+    "frameworks": {
+      "type": "array",
+      "description": "Detected frameworks/libraries, e.g. [\"fastapi\", \"pydantic\", \"next\", \"react\"].",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "testRunner": {
+      "type": "array",
+      "description": "Detected test runners, e.g. [\"pytest\", \"vitest\"].",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "database": {
+      "type": ["string", "null"],
+      "description": "Detected primary database, e.g. \"postgres\"; null/absent when none detected."
+    },
+    "lintFormat": {
+      "type": "array",
+      "description": "Detected linters/formatters/type-checkers, e.g. [\"ruff\", \"mypy\", \"eslint\"].",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "monorepo": {
+      "type": "boolean",
+      "description": "True when workspace/monorepo signals are present (pnpm-workspace.yaml, turbo.json, apps/+packages/, multiple package.json)."
+    },
+    "ci": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Detected CI system(s), e.g. [\"github-actions\"]; empty array / null when none detected."
+    },
+    "commands": {
+      "type": "object",
+      "description": "The real invocations to wire into hooks, keyed by purpose, e.g. { \"test\": \"uv run pytest\", \"typecheck\": \"uv run mypy .\", \"lint\": \"uv run ruff check .\", \"fe_test\": \"pnpm test\", \"fe_typecheck\": \"pnpm -s tsc --noEmit\" }.",
+      "additionalProperties": { "type": "string" }
+    },
+    "docs": {
+      "type": "object",
+      "description": "Existing documentation Forge should extend rather than overwrite.",
+      "additionalProperties": true,
+      "properties": {
+        "constitution": {
+          "type": ["string", "null"],
+          "description": "Path to an existing constitution (AGENTS.md / CLAUDE.md) if one exists."
+        },
+        "specs": {
+          "type": "array",
+          "description": "Existing spec/ADR directories or files.",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

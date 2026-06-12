@@ -1,0 +1,6 @@
+{
+  "name": "graph-dangling-fixture",
+  "version": "0.1.0",
+  "private": true,
+  "_note": "FIXTURE. Version aligned with VERSION and plugin.json so validate-registry emits NO version-triple-drift WARN — the ONLY advisory finding is the dangling foo-reviewer ref under test (EVAL-DEP-003)."
+}

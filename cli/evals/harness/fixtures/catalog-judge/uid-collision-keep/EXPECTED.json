@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "forge.eval.judge-expected.v1",
+  "aut": "bundle:catalog-judge",
+  "case_class": "conflict-judge",
+  "conflict_kind": "uid-collision",
+  "fixture_root": "conflict",
+  "resources": {
+    "a": { "uid": "skill:csv-export", "role": "existing", "contentHash": "sha256:cccc3333existing0000000000000000000000000000000000000000000000cc" },
+    "b": { "uid": "skill:csv-export", "role": "incoming", "contentHash": "sha256:dddd4444incoming0000000000000000000000000000000000000000000000dd" }
+  },
+  "expected": {
+    "verdict": "keep",
+    "winning_uid": "skill:csv-export",
+    "winning_role": "existing",
+    "losing_role": "incoming",
+    "human_gate": false,
+    "must_emit": [],
+    "rationale_axes": ["completeness", "correctness", "quality", "security_signal", "eval_signal"],
+    "match": {
+      "any_of": ["keep", "existing dominates", "existing is better", "drop the incoming"]
+    }
+  },
+  "notes": "Same uid, two bodies — the MIRROR of the replace case. Here the EXISTING (resource A) is better: it streams the export and quotes fields per RFC-4180 with a passing eval, while the INCOMING (resource B) buffers the whole table in memory and emits unescaped fields (a correctness defect) with a stale/failing eval. The winner is the existing resource, so the incoming is dropped from admission — verdict KEEP. No catalog write and no human gate (keep stays within the judge's authority once calibrated, INV-6). This is the discriminating pair: same shape as replace, opposite winner — the judge must not default to 'newer wins'."
+}

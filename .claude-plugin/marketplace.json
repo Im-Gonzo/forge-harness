@@ -1,0 +1,31 @@
+{
+  "name": "forge",
+  "owner": {
+    "name": "Gonzalo Alcala"
+  },
+  "metadata": {
+    "description": "Forge - a personal, self-tailoring Claude Code harness (library + bootstrap engine + self-validators)"
+  },
+  "plugins": [
+    {
+      "name": "forge",
+      "source": "./cli",
+      "description": "A personal Claude Code harness that installs once globally and tailors itself to every project.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Gonzalo Alcala"
+      },
+      "license": "Apache-2.0",
+      "category": "workflow",
+      "keywords": [
+        "claude-code",
+        "harness",
+        "agents",
+        "skills",
+        "commands",
+        "bootstrap"
+      ],
+      "strict": false
+    }
+  ]
+}

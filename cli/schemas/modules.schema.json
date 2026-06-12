@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/modules.schema.json",
+  "title": "Forge modules manifest (manifests/modules.json)",
+  "description": "Map of module name -> the components it contributes. The composer unions the components of the selected modules. componentKinds declares the legal component-kind keys; each module's components uses a subset of them. validate-manifests enforces that every named component resolves to a real file once the asset dirs are populated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "componentKinds", "modules"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Manifest schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the composer."
+    },
+    "componentKinds": {
+      "type": "array",
+      "description": "The legal component-kind keys a module's components object may use.",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "modules": {
+      "type": "object",
+      "description": "Map of module name -> module definition.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "components"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "always": {
+            "type": "boolean",
+            "description": "When true, this module is installed by every profile (e.g. core)."
+          },
+          "components": {
+            "type": "object",
+            "description": "Component-kind -> list of component names. Keys should be members of the top-level componentKinds.",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "propertyNames": {
+              "enum": ["agents", "skills", "commands", "rules", "hooks", "bundles", "workflows", "mcp", "engine", "validators"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

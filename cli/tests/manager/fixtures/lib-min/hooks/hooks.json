@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/edit-citation-gate.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "Fixture hook: on the first edit/write this session, require a rule/spec citation. Used to give the registry one hook record recorded by id.",
+        "id": "forge:edit-citation-gate"
+      }
+    ]
+  }
+}

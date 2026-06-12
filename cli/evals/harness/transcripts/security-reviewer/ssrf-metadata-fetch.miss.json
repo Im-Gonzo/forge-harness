@@ -1,0 +1,14 @@
+{
+  "_note": "Hand-written MOCK security-reviewer output that MISSES the planted SSRF (it only notes a cosmetic timeout nit, never citing line 42 / SSRF). gradeReviewerCase(...) MUST FAIL (fn=1). Demonstrates the grader catches a false-negative reviewer.",
+  "case": "ssrf-metadata-fetch",
+  "aut": "agent:security-reviewer",
+  "findings": [
+    {
+      "file": "app.py",
+      "line": 23,
+      "severity": "LOW",
+      "title": "Consider making the request timeout configurable",
+      "body": "PREVIEW_TIMEOUT_SECONDS is hardcoded to 5. Cosmetic only."
+    }
+  ]
+}

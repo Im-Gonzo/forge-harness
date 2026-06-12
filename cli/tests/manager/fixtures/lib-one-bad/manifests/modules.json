@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for lib-one-bad. Names the valid artifacts (code-reviewer, diff-reviewer, review-discipline). The malformed agents/broken-frontmatter.md is intentionally NOT named — the build's single finding about it is a parse/fail-open finding, independent of orphan classification.",
+  "componentKinds": ["agents", "rules"],
+  "modules": {
+    "review": {
+      "description": "One-bad fixture review module naming only the valid artifacts.",
+      "components": {
+        "agents": ["code-reviewer", "diff-reviewer"],
+        "rules": ["review-discipline"]
+      }
+    }
+  }
+}

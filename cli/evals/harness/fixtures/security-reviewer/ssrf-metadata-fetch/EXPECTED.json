@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "forge.eval.expected.v1",
+  "aut": "agent:security-reviewer",
+  "case_class": "planted-defect",
+  "fixture_root": "code",
+  "defects": [
+    {
+      "id": "ssrf-1",
+      "class": "SSRF",
+      "file": "app.py",
+      "line": 42,
+      "min_severity": "HIGH",
+      "match": {
+        "any_of": [
+          "SSRF",
+          "server-side request forgery",
+          "169.254.169.254",
+          "cloud metadata",
+          "allowlist"
+        ]
+      }
+    }
+  ],
+  "clean_lines": [23, 26],
+  "clean_traps": []
+}

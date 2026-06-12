@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/adjudication.schema.json",
+  "title": "Forge conflict adjudication (.forge/adjudication.json)",
+  "description": "Per-active-root project state: the project's CONFLICT-adjudication policy and its recorded human choices. A CONFLICT is exactly a read-view uid with >= 2 distinct candidate records — i.e. a dedup uid-collision or near-dup across the project's library-local + subscribed-slice sources (ADR-0017 §5.1, ADR-0018 read-view). Conflicts are DERIVED deterministically from the catalog records (manager/catalog.mjs) and are never stored; only the POLICY and the human CHOICES live here. The adjudication POLICY is per-criticality (safety|compliance|normal, ADR-0013) and is either \"auto\" or \"block\"; the DEFAULT is all-block (conservative — every conflict needs an explicit human pick). A recorded CHOICE is a human T2 decision (ADR-0017 §7 / BR-CAT-003) naming the winning sourceId (or null for the library-local copy) for a conflict uid. The CLI is DETERMINISTIC-COLLECTION only (METHOD §7): it COLLECTS conflicts and CONSUMES any recorded judge verdict (.forge/catalog-verdicts.json, BR-CAT-001) + eval scores, but it NEVER invokes the judge agent or any model, and never produces a verdict. Resolving a conflict with --apply updates the composition (.forge/composition.json) via manager/compose.mjs so the winner's (uid, sourceId) is adopted and the losing peers for that uid are removed; this is a T2 human action and never a self-applied replace of an admitted library resource (BR-CAT-003), even under policy \"auto\". Owned by manager/conflict.mjs (forge conflict list|resolve|policy). Reads/writes go through manager/lib/store.mjs (readJson / writeJsonAtomic); writes are ADDITIVE and never destructive (resolve sets/clears one choice; policy sets one or more dimensions), preview by default and written only on --apply (the file is created on first --apply). This file lives UNDER the active project root, not in the git-tracked library.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "policy", "choices"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "On-disk schema tag for this file.",
+      "enum": ["forge.adjudication.v1"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the conflict operator."
+    },
+    "policy": {
+      "$ref": "#/definitions/policy"
+    },
+    "choices": {
+      "type": "array",
+      "description": "The recorded human adjudications. Each entry names the WINNER for a conflict uid (the human T2 pick, ADR-0017 §7 / BR-CAT-003). An absent uid is UNRESOLVED. Order is not significant; entries SHOULD be unique on uid (the operator dedups and keeps the last write per uid). A choice never auto-applies a replace of an already-admitted library resource — that remains a deliberate human --apply (BR-CAT-003).",
+      "items": {
+        "$ref": "#/definitions/choice"
+      }
+    }
+  },
+  "definitions": {
+    "policy": {
+      "type": "object",
+      "description": "The per-criticality adjudication policy. Each criticality (safety|compliance|normal, ADR-0013) maps to \"auto\" (a conflict with a graceful suggested winner may resolve without a per-conflict human pick) or \"block\" (the conflict is BLOCKING until a human resolves it). The DEFAULT is all-block — the conservative stance consistent with sources defaulting untrusted (ADR-0017) and slices defaulting unsubscribed (ADR-0018). NOTE: even under \"auto\", a resolve that would REPLACE an already-admitted library resource is a T2 human action (BR-CAT-003) and is never self-applied — \"auto\" governs only composition-level (per-project adoption) picks, never a library replace.",
+      "additionalProperties": false,
+      "required": ["normal", "compliance", "safety"],
+      "properties": {
+        "normal": { "$ref": "#/definitions/policyMode" },
+        "compliance": { "$ref": "#/definitions/policyMode" },
+        "safety": { "$ref": "#/definitions/policyMode" }
+      }
+    },
+    "policyMode": {
+      "type": "string",
+      "description": "How conflicts of a given criticality are adjudicated: \"auto\" (resolvable without a per-conflict human pick when a suggested winner exists) or \"block\" (BLOCKING until an explicit human resolve). Default \"block\".",
+      "enum": ["auto", "block"]
+    },
+    "choice": {
+      "type": "object",
+      "description": "One recorded human adjudication: the winning candidate for a conflict uid. winner is the sourceId of the chosen candidate, or null for the library-local copy (source === null). Recording a choice flips the conflict's state to \"manual\"; on --apply the winner's (uid, sourceId) is adopted into the composition and the losing peers for that uid are removed (manager/compose.mjs).",
+      "additionalProperties": false,
+      "required": ["uid", "winner"],
+      "properties": {
+        "uid": {
+          "$ref": "#/definitions/uid"
+        },
+        "winner": {
+          "$ref": "#/definitions/winner"
+        }
+      }
+    },
+    "uid": {
+      "type": "string",
+      "description": "A resource uid \"<kind>:<id>\": the singular registry kind (agent|skill|command|rule|hook|bundle|validator|mcp|meta-test|engine) and the resource id, joined by a single colon (ADR-0005 / the registry record). This is the conflict key — the uid that resolves to >= 2 distinct candidate records in the read-view.",
+      "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9._-]*$",
+      "minLength": 3
+    },
+    "winner": {
+      "description": "The chosen candidate for this conflict: the source id (manifests/sources.json#sources[].id) of the winning candidate, or null for the library-local copy (source === null, ADR-0017).",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A source id (manifests/sources.json#sources[].id) — the winning candidate came from this source.",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "minLength": 1
+        },
+        {
+          "type": "null",
+          "description": "The library-local copy (source === null) is the winner."
+        }
+      ]
+    }
+  }
+}

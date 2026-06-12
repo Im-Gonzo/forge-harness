@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/lock.schema.json",
+  "title": "Forge project lockfile (<activeRoot>/forge.lock)",
+  "description": "The RESOLVED per-project COMPOSITION manifest: the project analogue of package-lock.json. `forge.lock` is the single, git-committable statement of exactly what this project has composed — the ADOPTED set (.forge/composition.json, ADR-0019) JOINED with the TAILORING overlays (.forge/tailoring.json, ADR-0021), the ADJUDICATION choices (.forge/adjudication.json, ADR-0020), and each entry's pinned version/commit (the catalog record / .forge/sources.lock), plus a DETERMINISTIC content hash over the resolved entries (ADR-0022). It lives at the ACTIVE PROJECT ROOT (<activeRoot>/forge.lock), NOT under .forge/ and NOT in the git-tracked library, and is intended to be COMMITTED (like package-lock.json). It is DISTINCT from .forge/sources.lock (forge.sources.lock.v1, catalog.md §2.2), which pins each SOURCE's resolved git commit, lives under .forge/, and is machine-local (never committed): forge.lock records what the PROJECT resolved, sources.lock records where the SOURCE bytes came from. forge.lock CONSUMES sources.lock's per-entry commit as one input; that is the only relationship. The lockfile is DERIVED — a pure JOIN over existing per-project stores, reusing the read helpers of manager/compose.mjs, manager/tailor.mjs, and manager/conflict.mjs — so it adds no new authoritative state and is reproducible from its inputs. Owned by manager/lock.mjs (forge lock show|write|diff). `lock write` is MANIFEST-ONLY: it writes ONLY this file (writeJsonAtomic via manager/lib/store.mjs, preview by default, written on --apply); it MUST NOT materialize/generate or modify any real .claude/ file, the git-tracked library, or any resource content (materializing the composition into .claude/ is the bootstrap composer's job, OUT OF SCOPE — ADR-0022 §7).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "generatedAt", "hash", "entries"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "On-disk schema tag for this file.",
+      "enum": ["forge.lock.v1"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the lock operator."
+    },
+    "generatedAt": {
+      "type": "string",
+      "description": "An ISO-8601 timestamp from the CLI runtime clock recording when the lock was last written (the standard JS Date API is available in the CLI itself; only Workflow scripts forbid it). Recorded for humans ONLY — it is the ONE field the content `hash` EXCLUDES, so the SAME composition yields the SAME hash across machines and times (ADR-0022 §3). MUST NOT feed the hash.",
+      "format": "date-time"
+    },
+    "hash": {
+      "type": "string",
+      "description": "A DETERMINISTIC content digest (sha256 via node:crypto, first 8–16 hex) over the CANONICAL resolved `entries` — entries sorted by uid then sourceId, each entry's overlays sorted, taken over the resolved fields (uid, sourceId, kind, version, commit, sorted overlays, adjudication) and EXCLUDING `generatedAt`. The SAME composition yields the SAME hash; re-writing an unchanged composition is idempotent (same entries → same hash). Two checkouts / a CI run compare this one short digest to assert they resolved the same thing (ADR-0022 §3).",
+      "pattern": "^[0-9a-f]{8,64}$"
+    },
+    "entries": {
+      "type": "array",
+      "description": "The resolved set: one entry per composed (uid, sourceId) in the project's composition (ADR-0019), with its tailoring overlays (ADR-0021), adjudication winner (ADR-0020), and pinned version/commit JOINED in. This is the resolved WHOLE; the composition, tailoring, and adjudication stores remain the irreducible inputs. Order is not significant; the operator sorts entries deterministically (by uid, then sourceId) and sorts each entry's overlays before computing the hash.",
+      "items": {
+        "$ref": "#/definitions/lockEntry"
+      }
+    }
+  },
+  "definitions": {
+    "lockEntry": {
+      "type": "object",
+      "description": "One resolved composition entry, identified by the pair (uid, sourceId) — the SAME identity the composition (ADR-0019) and tailoring (ADR-0021) stores use. It JOINS the adopted set with the resource kind/version, the pinned source commit, the tailoring overlays, and the adjudication winner. The same uid adopted from the library (sourceId === null) and from a source are two DISTINCT entries.",
+      "additionalProperties": false,
+      "required": ["uid", "sourceId", "kind", "version", "commit", "overlays", "adjudication"],
+      "properties": {
+        "uid": {
+          "$ref": "#/definitions/uid"
+        },
+        "sourceId": {
+          "$ref": "#/definitions/sourceId"
+        },
+        "kind": {
+          "$ref": "#/definitions/kind"
+        },
+        "version": {
+          "type": ["string", "null"],
+          "description": "The resolved version. A `pin` tailoring overlay (ADR-0021) wins; else the catalog record version. May be null when neither the record nor a pin supplies one."
+        },
+        "commit": {
+          "type": ["string", "null"],
+          "description": "The pinned source git commit (sha) JOINED from .forge/sources.lock (forge.sources.lock.v1, catalog.md §2.2 / ADR-0017) — the one input forge.lock consumes from the source lockfile — or null for a library-local entry (sourceId === null) or an unpinned source."
+        },
+        "overlays": {
+          "type": "array",
+          "description": "The tailoring overlays recorded for this (uid, sourceId) in .forge/tailoring.json (ADR-0021), folded in for the resolved manifest. Sorted (by type, then detail) before the content hash is computed.",
+          "items": {
+            "$ref": "#/definitions/overlay"
+          }
+        },
+        "adjudication": {
+          "description": "The recorded conflict-adjudication winner for this uid (ADR-0020): the sourceId chosen to win when the uid had >= 2 candidates, or null when there was no conflict / the library-local copy won / no choice is recorded.",
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "The winning sourceId for this uid (a recorded human T2 pick, ADR-0020)."
+            },
+            {
+              "type": "null",
+              "description": "No adjudication (no conflict, or the library-local copy, or no recorded choice)."
+            }
+          ]
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "description": "One tailoring overlay folded into the resolved entry — a { type, detail } recorded in .forge/tailoring.json (ADR-0021 / BR-CAT-014). `type` is a closed set; `detail` is a short type-specific string (MAY be \"\" for fork/disable). See schemas/tailoring.schema.json for the authoritative overlay shape.",
+      "additionalProperties": false,
+      "required": ["type", "detail"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The overlay kind: pin (lock a version) | override (change a frontmatter field, \"field → value\") | layer (layer a fragment on top of the body) | gate (conditional activation) | fork (detach the body for local edits) | disable (turn the resource off).",
+          "enum": ["pin", "override", "layer", "gate", "fork", "disable"]
+        },
+        "detail": {
+          "type": "string",
+          "description": "The type-specific overlay detail (e.g. \"v3.2.0\" for pin, \"model → opus\" for override). MAY be an empty string for fork/disable."
+        }
+      }
+    },
+    "kind": {
+      "type": "string",
+      "description": "The singular registry kind of the resource (JOINED from the catalog record, ADR-0005).",
+      "enum": [
+        "agent",
+        "skill",
+        "command",
+        "rule",
+        "hook",
+        "bundle",
+        "validator",
+        "mcp",
+        "meta-test",
+        "engine"
+      ]
+    },
+    "uid": {
+      "type": "string",
+      "description": "A resource uid \"<kind>:<id>\": the singular registry kind (agent|skill|command|rule|hook|bundle|validator|mcp|meta-test|engine) and the resource id, joined by a single colon (ADR-0005 / the registry record).",
+      "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9._-]*$",
+      "minLength": 3
+    },
+    "sourceId": {
+      "description": "The source the resource was adopted from: the source id (manifests/sources.json#sources[].id), or null for the library-local copy (an owned in-tree record, source === null, ADR-0017).",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A source id (manifests/sources.json#sources[].id).",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "minLength": 1
+        },
+        {
+          "type": "null",
+          "description": "The library-local copy (source === null)."
+        }
+      ]
+    }
+  }
+}

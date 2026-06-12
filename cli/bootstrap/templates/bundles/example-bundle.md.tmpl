@@ -1,0 +1,98 @@
+---
+# ── Context bundle (WARM) — one curated index per work-type. ────────────────
+# Pointers only; it NEVER restates normative text (single source of truth, docs/METHOD.md §1).
+# All 16 keys below are REQUIRED (schemas/bundle.schema.json). Replace every <placeholder>.
+# Seeded by Forge {{FORGE_VERSION}} (profile {{PROFILE}}) for {{PROJECT_NAME}}.
+
+# ── identity ───────────────────────────────────────────────
+id: example-work-type            # unique slug; rename to the work-type, e.g. core-write-path
+title: "<Human-readable work-type — e.g. Core write path & state transitions>"
+version: 1
+status: draft                    # active | draft | archived
+
+# ── what slice(s) this serves ──────────────────────────────
+work_type: "<the recurring class of slice this bundle serves>"
+# NOTE: tenancy/RLS, core write-path, and v1->v2 migration work-types MUST set human_gate: true.
+
+# ── the WARM index: pointers only, content stays COLD ──────
+invariants:                      # non-empty subset of AGENTS.md invariants 1..10 (by integer)
+  - 1                            # evidence before claims (seed — replace with this slice's real ones)
+  - 2                            # cite the rule
+adrs:                            # referenced ADRs (pointers; content stays COLD). [] if none yet.
+  - id: ADR-0001
+    path: <architecture/adr/ADR-0001-...md>
+    why: "<why this ADR governs this slice>"
+spec_sections:                   # referenced spec files + the relevant sections. [] if none yet.
+  - path: <spec/01-...md>
+    sections: ["<§N the relevant section>"]
+br_ids: []                       # business-rule IDs this bundle implements, e.g. [BR-WORK-002]. Pattern: BR-<AREA>-<n>.
+conformance: []                  # conformance assertions, typically spec-section refs, e.g. ["spec/03 §13 #1"]
+modules:                         # the code modules this bundle touches
+  - <module-name>
+
+# ── the matching harness pieces (named, not inlined) ───────
+skill: skills/<primary-skill>/SKILL.md     # primary harness skill that drives this work
+agent: agents/<implementer>.md             # primary implementer agent
+# reviewer: agents/<reviewer>.md           # optional — a read-only reviewer for T1+ work
+
+# ── the slice's Definition of Done (by reference) ──────────
+dod_ref: <planning/backlog.md#definition-of-done>   # DoD reference (file path, optional #anchor)
+acceptance_gates:                # optional — this slice's acceptance criteria
+  - "<the concrete, checkable acceptance gate for this slice>"
+release_blocking_gates:          # optional — gates that block release if red
+  - "<the static/CI gate that must stay green>"
+
+# ── the invisible-20% defense (docs/METHOD.md §2) ──────────
+# The cross-cutting concerns agents reliably DROP. Each rule is PAIRED with a concrete check (a test to
+# write) so the invisible 20% is in context from step one and reinforced at review + CI.
+invisible_20:
+  - id: cite-the-rule
+    rule: "Every change names the governing spec/ADR/rule it implements; no rule behind it ⇒ it does not merge."
+    check: "reviewer rejects any diff in this slice with no cited rule id"
+    refs: ["AGENTS.md invariant 2"]
+  - id: evidence-before-claims
+    rule: "No 'passing' claim without a FRESH command run + exit code shown at the moment of the claim."
+    check: "{{TEST_CMD}} and {{TYPECHECK_CMD}} run fresh and pasted before 'done'"
+    refs: ["docs/METHOD.md §4", "AGENTS.md invariant 1"]
+  - id: <this-slices-real-invisible-rule>
+    rule: "<the cross-cutting concern THIS work-type is most likely to drop — replace this>"
+    check: "<the test/gate that proves it holds>"
+    refs: ["<spec/ADR/BR pointer>"]
+
+# ── safety ─────────────────────────────────────────────────
+human_gate: false                # true for tenancy/RLS, core write-path, or v1->v2 migration work-types
+# human_gate_reason: "<why a human must gate this>"   # required when human_gate is true
+---
+
+## Purpose
+
+Serves the **<work-type>** slice-class. The riskiest thing it must get right: **<the one cross-cutting thing
+this slice cannot get wrong>**. Replace this paragraph with the real one before setting `status: active`.
+
+## Retrieval plan
+
+1. Confirm HOT loaded (`AGENTS.md` + its invariants). 2. Read this bundle whole. 3. JIT, in implementation
+order: `<spec §>` → `<ADR>` → `<spec §>` … grep the relevant `br_ids` in the rule corpus per step. Never read
+whole files — pull only on a stated need. Nothing in the COLD corpus or `memory/` is auto-loaded.
+
+## Invariants in play
+
+List the `invariants` above with a one-line reminder each (reminders only — the normative text lives in HOT /
+the cited ADRs/rules, never restated here).
+
+## The invisible 20% — do not drop these
+
+Re-read before claiming done. Each `invisible_20` entry pairs a cross-cutting **rule** with the **check** to
+write. The reviewer checks the diff against `br_ids` + `conformance` + `invisible_20` before merge; the same
+list is the reviewer checklist and (where applicable) the release-blocking CI gate.
+
+## Human gate
+
+`human_gate: <true|false>`. If true: **propose the plan + diff, then STOP and wait for a human** — never
+auto-run a change to a human-gated surface (`AGENTS.md` autonomy boundary).
+
+## Prior art / memory
+
+Retrieve on demand from the COLD vault (`memory/index.md`): prior decisions and gotchas tagged to this
+work-type. Pull only on a stated need; nothing here is auto-loaded, and a recalled entry is a pointer to
+verify against live code (`docs/METHOD.md` §8).

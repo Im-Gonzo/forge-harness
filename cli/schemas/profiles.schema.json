@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/profiles.schema.json",
+  "title": "Forge profiles manifest (manifests/profiles.json)",
+  "description": "Named module sets per kind of project. The composer picks ONE base profile then applies moduleSelectionRules. validate-manifests enforces that every module a profile names exists in modules.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "defaultProfile", "profiles"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Manifest schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the composer."
+    },
+    "defaultProfile": {
+      "type": "string",
+      "description": "Profile used when the profiler cannot confidently classify the stack; must be a key in profiles.",
+      "minLength": 1
+    },
+    "profiles": {
+      "type": "object",
+      "description": "Map of profile name -> profile definition.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "modules"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modules": {
+            "type": "array",
+            "description": "Module names composing this profile; each must exist in modules.json.",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "moduleSelectionRules": {
+      "type": "object",
+      "description": "Hints the composer applies on top of the base profile, keyed off profile-project.json facts.",
+      "additionalProperties": false,
+      "properties": {
+        "_note": { "type": "string" },
+        "add": {
+          "type": "array",
+          "description": "Conditional module additions.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["when", "module"],
+            "properties": {
+              "when": {
+                "type": "string",
+                "description": "Condition expressed against facts, e.g. \"facts.database == 'postgres'\".",
+                "minLength": 1
+              },
+              "module": {
+                "type": "string",
+                "description": "Module to add when the condition holds; must exist in modules.json.",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "drop": {
+          "type": "array",
+          "description": "Conditional module removals (same shape as add).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["when", "module"],
+            "properties": {
+              "when": { "type": "string", "minLength": 1 },
+              "module": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

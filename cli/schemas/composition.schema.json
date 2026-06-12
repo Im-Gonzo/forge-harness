@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/composition.schema.json",
+  "title": "Forge project composition (.forge/composition.json)",
+  "description": "Per-active-root project state: the set of resources this project has ADOPTED from its catalog READ-VIEW. A project's COMPOSITION is its declared working set, distinct from the global git-tracked LIBRARY that admission curates (ADR-0019). An adopted entry is keyed by the pair (uid, sourceId): `uid` is the resource uid \"<kind>:<id>\" (ADR-0005) and `sourceId` is the source id it was adopted from, or null for the library-local copy. ADOPT != ADMIT: adoption records a per-project selection and does NOT run the admission pipeline, consult the T2 gate, or write the library (the catalog admit -> library path is UNCHANGED). Adoptability is gated by the ADR-0018 read-view (library-local records UNION subscribed-slice records); a resource must be visible to be adopted. A newly visible resource defaults UNADOPTED (opt-in, consistent with slices defaulting unsubscribed, ADR-0018, and sources defaulting untrusted, ADR-0017). Owned by manager/compose.mjs (forge compose list|adopt|remove). Writes are ADDITIVE and never destructive (writeJsonAtomic via manager/lib/store.mjs); adopt/remove only add/drop one (uid, sourceId) entry. An entry whose resource is no longer in the read-view (orphan) is REPORTED (WARN), never silently deleted. This file lives UNDER the active project root, not in the git-tracked library, and is created on first --apply.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "adopted"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "On-disk schema tag for this file.",
+      "enum": ["forge.composition.v1"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the composition operator."
+    },
+    "adopted": {
+      "type": "array",
+      "description": "The resources this project has adopted from its read-view. Each entry is the pair (uid, sourceId). An absent (uid, sourceId) pair is UNADOPTED. Order is not significant; entries SHOULD be unique on (uid, sourceId) (the operator dedups and sorts on write — by uid, then sourceId).",
+      "items": {
+        "$ref": "#/definitions/adoptedEntry"
+      }
+    }
+  },
+  "definitions": {
+    "adoptedEntry": {
+      "type": "object",
+      "description": "One adopted resource, identified by the pair (uid, sourceId). The same uid adopted from the library (sourceId === null) and from a source are two DISTINCT entries.",
+      "additionalProperties": false,
+      "required": ["uid", "sourceId"],
+      "properties": {
+        "uid": {
+          "$ref": "#/definitions/uid"
+        },
+        "sourceId": {
+          "$ref": "#/definitions/sourceId"
+        }
+      }
+    },
+    "uid": {
+      "type": "string",
+      "description": "A resource uid \"<kind>:<id>\": the singular registry kind (agent|skill|command|rule|hook|bundle|validator|mcp|meta-test|engine) and the resource id, joined by a single colon (ADR-0005 / the registry record).",
+      "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9._-]*$",
+      "minLength": 3
+    },
+    "sourceId": {
+      "description": "The source the resource was adopted from: the source id (manifests/sources.json#sources[].id), or null for the library-local copy (an owned in-tree record, source === null, ADR-0017).",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A source id (manifests/sources.json#sources[].id).",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "minLength": 1
+        },
+        {
+          "type": "null",
+          "description": "The library-local copy (source === null)."
+        }
+      ]
+    }
+  }
+}

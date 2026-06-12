@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for dangling-ref. The one agent is in a module (so it is not itself an orphan); its prose ref to ghost-reviewer is the PLANTED dangler the retargeted EVAL-DEP-001 detects on a synthetic library.",
+  "componentKinds": ["agents"],
+  "modules": {
+    "review": {
+      "description": "Single-agent fixture with a dangling prose handoff to a non-existent reviewer.",
+      "components": {
+        "agents": ["planted-reviewer"]
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "_note": "Seeded criticality allowlist (ADR-0013, BR-EFF-006). Criticality is ASSIGNED here, never inferred from prose. A safety/compliance artifact can NEVER be classified dead, NEVER enter a prune-plan, and NEVER lose keeper status — regardless of fire/cite count, cost, or value-density. Keys are criticality classes; values are artifact uids (kind:id, e.g. hook:forge:secret-scan, rule:security-baseline). An artifact absent from this map is `normal`. Err toward `safety` for security-adjacent artifacts: a false `safety` tag keeps a harmless artifact; a false `normal` tag risks deleting a safety net.",
+  "safety": [
+    "hook:forge:secret-scan",
+    "hook:forge:block-no-verify",
+    "hook:forge:config-protection",
+    "rule:prompt-defense-baseline",
+    "rule:security-baseline"
+  ],
+  "compliance": []
+}

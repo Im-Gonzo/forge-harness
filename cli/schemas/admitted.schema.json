@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/admitted.schema.json",
+  "title": "Forge admitted manifest (manifests/admitted.json)",
+  "description": "Authoritative, REVERSIBLE record of every resource ACTIVATED into the active library by `forge catalog admit` (catalog-until-admitted, ADR-0017). Each entry is one admission: admit copied the resource's bytes from its source resource root to the canonical library target (kind+id -> componentCandidates) and appended a provenance record here so `forge catalog revoke` can delete the copied target and restore a replaced original. Owned by manager/catalog.mjs (admit/revoke). admit copies BYTES ONLY and NEVER executes fetched code (ADR-0017 §security). This manifest is NOT consumed by the composition validator (validate-manifests only checks modules.json/profiles.json); it is the catalog operator's own reversible state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "admitted"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "On-disk schema tag for this manifest.",
+      "enum": ["forge.admitted.v1"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Manifest schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the catalog operator."
+    },
+    "admitted": {
+      "type": "array",
+      "description": "One record per ACTIVATED resource, keyed (uniquely) by targetPath — one library path has at most one active admission.",
+      "items": {
+        "$ref": "#/definitions/admission"
+      }
+    }
+  },
+  "definitions": {
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uid", "sourceId", "repoUrl", "ref", "commit", "kind", "targetPath", "admittedAt"],
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Registry artifact uid \"<kind>:<id>\" of the admitted resource.",
+          "minLength": 1
+        },
+        "sourceId": {
+          "type": "string",
+          "description": "The federated source id the bytes were admitted from (manifests/sources.json#sources[].id). Empty string for a local/library-origin admission."
+        },
+        "repoUrl": {
+          "type": "string",
+          "description": "Clone URL (git) or filesystem path (local) of the source the bytes came from, copied from the source provenance at admit time. May be empty when unknown."
+        },
+        "ref": {
+          "type": "string",
+          "description": "Branch/tag/commit the source tracked at admit time (provenance ref). May be empty."
+        },
+        "commit": {
+          "type": "string",
+          "description": "Exact upstream commit the admitted bytes were synced from (.forge/sources.lock pin). May be empty when the source was unpinned."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The SINGULAR registry kind of the admitted resource (agent|skill|command|rule|bundle|workflow|mcp). Used by revoke to know whether the target is a file or a skill directory."
+        },
+        "targetPath": {
+          "type": "string",
+          "description": "Repo-relative (POSIX) path of the activated resource under the FORGE library root (the canonical componentCandidates target). For a skill this is the skills/<id>/SKILL.md file; revoke removes its containing skill dir.",
+          "minLength": 1
+        },
+        "admittedAt": {
+          "type": "string",
+          "description": "ISO-8601 timestamp of the activation."
+        },
+        "replaced": {
+          "type": "object",
+          "description": "Present ONLY when the activation OVERWROTE an existing library resource (a REPLACE, gated by a T2 --override). Holds the original bytes so revoke can restore them.",
+          "additionalProperties": false,
+          "required": ["path", "backupB64"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Repo-relative (POSIX) path of the replaced resource (equals targetPath).",
+              "minLength": 1
+            },
+            "backupB64": {
+              "type": "string",
+              "description": "Base64 of the original bytes. For a file: base64 of the file. For a skill dir: base64 of a JSON map { \"<relpath>\": \"<base64-bytes>\" } of every file under the dir, so revoke can rebuild the original tree."
+            }
+          }
+        }
+      }
+    }
+  }
+}

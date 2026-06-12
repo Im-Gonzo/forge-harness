@@ -1,0 +1,2 @@
+2026-06-10T07:14:23.139Z  cmd="node --input-type=module -e 'import {assertDisjointFiles} from "./workflows/foundation-build-verify.js" ...'"  exit=1  verdict=RED  reason="workflows/foundation-build-verify.js does not exist (ERR_MODULE_NOT_FOUND) — behavior not yet built"
+2026-06-10T07:25:04.659Z  cmd="node --input-type=module -e 'import {assertDisjointFiles} ... shared->throw, disjoint->ok, null->ok'"  exit=0  verdict=GREEN  baseline=78ba1029f27b  reason="assertDisjointFiles exported pure fn; shared file throws naming the file; disjoint ok; files:null sentinel ok"

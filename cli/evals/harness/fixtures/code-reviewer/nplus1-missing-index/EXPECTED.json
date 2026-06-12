@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "forge.eval.expected.v1",
+  "aut": "agent:code-reviewer",
+  "case_class": "planted-defect",
+  "fixture_root": "code",
+  "defects": [
+    {
+      "id": "nplus1-1",
+      "class": "N_PLUS_ONE",
+      "file": "orders.py",
+      "line": 36,
+      "min_severity": "MEDIUM",
+      "match": {
+        "any_of": [
+          "N+1",
+          "N + 1",
+          "one query per",
+          "query per order",
+          "per-order query",
+          "query inside the loop",
+          "query in a loop"
+        ]
+      }
+    },
+    {
+      "id": "missing-index-1",
+      "class": "MISSING_INDEX",
+      "file": "schema.sql",
+      "line": 19,
+      "min_severity": "MEDIUM",
+      "match": {
+        "any_of": [
+          "missing index",
+          "no index",
+          "unindexed",
+          "full table scan",
+          "sequential scan",
+          "add an index",
+          "index on line_items.order_id",
+          "index on order_id"
+        ]
+      }
+    }
+  ],
+  "clean_lines": [15, 30],
+  "clean_traps": []
+}

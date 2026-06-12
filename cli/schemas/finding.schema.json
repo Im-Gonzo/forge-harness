@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/finding.schema.json",
+  "title": "Forge unified finding (C2)",
+  "description": "The single shape every check emits — whether parsed from a child validator's `LEVEL path:line message` line or emitted by a manager module. Owned by Bundle F (ADR-0004, BR-INT-006). See docs/manager/spec/SPEC-09-data-model.md §The unified finding (C2).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["level", "path", "line", "message", "source"],
+  "properties": {
+    "level": {
+      "type": "string",
+      "description": "Severity of the finding.",
+      "enum": ["ERROR", "WARN", "INFO"]
+    },
+    "path": {
+      "type": "string",
+      "description": "Repo-relative path the finding concerns."
+    },
+    "line": {
+      "type": ["integer", "null"],
+      "description": "1-based line the finding concerns, or null when not line-scoped."
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable description of the finding.",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "description": "Emitter — the child validator's filename or the manager module noun.",
+      "minLength": 1
+    }
+  }
+}

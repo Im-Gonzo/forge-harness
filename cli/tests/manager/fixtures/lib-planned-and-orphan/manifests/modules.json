@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for lib-planned-and-orphan. The review module names code-reviewer (file present -> active) and planned-reviewer (NO file -> status planned, NOT an error). The on-disk agents/orphan-reviewer.md is named by NO module -> flagged orphan. This isolates BR-REG-005 planned-vs-orphan classification.",
+  "componentKinds": ["agents"],
+  "modules": {
+    "review": {
+      "description": "Planned/orphan fixture module. Names one present and one absent (planned) agent.",
+      "components": {
+        "agents": ["code-reviewer", "planned-reviewer"]
+      }
+    }
+  }
+}

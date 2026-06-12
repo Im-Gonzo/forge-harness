@@ -1,0 +1,136 @@
+/* Memory route theming. Imports the base @xyflow/react stylesheet, then tunes
+ * the canvas to the dark Forge Web theme. Mirrors graph.css, but for the
+ * read-only memory wiki-link graph: nodes sized by link degree, colored by
+ * memory-type, dimmed when orphaned, and red-dashed when a dangling ghost. */
+@import "@xyflow/react/dist/style.css";
+
+.forge-memory-graph {
+  --xy-background-color: var(--background);
+  --xy-edge-stroke: oklch(0.5 0 0);
+  --xy-edge-stroke-selected: var(--foreground);
+  --xy-node-border-default: var(--border);
+  --xy-node-background-color-default: var(--card);
+  height: 100%;
+  width: 100%;
+}
+
+/* Canvas chrome blends into the dark theme (identical to .forge-graph). */
+.forge-memory-graph .react-flow__controls {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: hidden;
+}
+.forge-memory-graph .react-flow__controls-button {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+.forge-memory-graph .react-flow__controls-button:hover {
+  background: var(--muted);
+}
+.forge-memory-graph .react-flow__controls-button svg {
+  fill: var(--foreground);
+}
+.forge-memory-graph .react-flow__minimap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.forge-memory-graph .react-flow__attribution {
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.forge-memory-graph .react-flow__background {
+  background: var(--background);
+}
+
+/* Entry node card. --accent-color = memory-type color, --node-scale = degree
+ * sizing, --node-opacity = confidence (or 1 when confidence-less). */
+.memory-node {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 6px 10px;
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--foreground);
+  min-width: 96px;
+  max-width: 220px;
+  cursor: pointer;
+  transform: scale(var(--node-scale, 1));
+  opacity: var(--node-opacity, 1);
+  transition:
+    box-shadow 0.1s ease,
+    border-color 0.1s ease,
+    opacity 0.1s ease;
+}
+.memory-node:hover {
+  box-shadow: 0 0 0 1px var(--accent-color, var(--ring));
+}
+.memory-node[data-selected="true"] {
+  border-color: var(--accent-color, var(--ring));
+  box-shadow: 0 0 0 2px var(--accent-color, var(--ring));
+}
+.memory-node[data-focus="true"] {
+  border-color: var(--accent-color, var(--ring));
+  box-shadow: 0 0 0 2px var(--accent-color, var(--ring));
+}
+/* Orphans (no in/out links): dimmed + dashed so they recede into triage. */
+.memory-node[data-orphan="true"] {
+  border-style: dashed;
+  opacity: 0.45;
+}
+/* Dangling wiki-link target: a red dashed ghost (mirrors graph dangling). */
+.memory-node[data-dangling="true"] {
+  border-style: dashed;
+  border-color: oklch(0.7 0.19 22);
+  background: oklch(0.7 0.19 22 / 0.12);
+  color: oklch(0.82 0.12 22);
+}
+.memory-node__type {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+.memory-node__title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.memory-node__dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+/* A confidence ring: a thin outline whose alpha tracks confidence. */
+.memory-node__ring {
+  pointer-events: none;
+  position: absolute;
+  inset: -3px;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent-color, var(--ring));
+}
+.memory-node .react-flow__handle {
+  width: 6px;
+  height: 6px;
+  background: var(--muted-foreground);
+  border: none;
+}
+
+/* Directed wiki-link edges. Unresolved (ghost) edges go red + dashed. */
+.forge-memory-graph .react-flow__edge.dangling .react-flow__edge-path {
+  stroke: oklch(0.7 0.19 22);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+.forge-memory-graph .react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 2.5;
+}

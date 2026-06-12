@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/bootstrap/detect-project.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "All-kinds fixture hook. One hook id so the registry records kind=hook with path \"hooks/hooks.json#forge:detect-project\".",
+        "id": "forge:detect-project"
+      }
+    ]
+  }
+}

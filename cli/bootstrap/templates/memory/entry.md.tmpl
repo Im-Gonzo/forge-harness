@@ -1,0 +1,42 @@
+---
+# Memory entry schema — copy this file to memory/<type>/<id>-<slug>.md and fill in.
+# Schema per docs/METHOD.md §8 (confidence-scored, evidence-backed, curated).
+# Seeded by Forge {{FORGE_VERSION}} (profile {{PROFILE}}).
+id: <type-prefix>-0001          # decisions=d- glossary=gt- gotchas=g- learnings=l- runbooks=rb-
+title: <one-line title — what this entry tells a future reader>
+type: <decision | glossary | gotcha | learning | runbook>   # must match the dir it lives in
+status: active                  # active | superseded | deprecated  (only `active` shows in index.md)
+created: {{GENERATED_AT}}        # the date this was WRITTEN — recall trust keys off this
+updated: {{GENERATED_AT}}
+confidence: 0.5                  # 0–1. Rises on recurrence without correction; falls on contradiction.
+tags: []                        # module / rule-family / invariant-N / work-type — what a recall grep matches
+links:
+  rules: []                     # .claude/rules/* this entry relates to
+  invariants: []                # invariant numbers from AGENTS.md, e.g. [1, 4]
+  specs: []                     # spec/ADR pointers, e.g. ["spec/03 §5"]
+  vault: []                     # related memory entry ids
+supersedes: null                # id of the entry this replaces, or null
+superseded_by: null             # set when a newer entry replaces this one (then flip status)
+source: <where this came from — a PR, a debugging session, an ADR>
+---
+
+## Summary
+
+<!-- 2–4 sentences. The hook line in index.md is the compressed version of this. -->
+
+## Detail
+
+<!-- The substance. For a gotcha: Symptom / Cause / Fix-guard. For a decision: the choice + why +
+     alternatives rejected. For a runbook: ordered steps. Cite pointers; do not restate normative text. -->
+
+## Evidence
+
+<!-- REQUIRED (docs/METHOD.md §4, §8). Dated proof this entry is true. Each line: a date + what was
+     observed + the command/file/line/output that showed it. A recalled entry is a pointer to RE-VERIFY
+     against live code, never authoritative on its own. -->
+
+- {{GENERATED_AT}} — <what was observed, and the command/output/line that proves it>
+
+## See also
+
+<!-- Related entries, rules, specs. -->

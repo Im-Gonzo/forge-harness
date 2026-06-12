@@ -1,0 +1,14 @@
+{
+  "_note": "The dedup stage flagged this pair as a NEAR-DUP on a high content-similarity score (shared migration boilerplate / phrasing). Both security signals GREEN. The judge's job is to decide whether the similarity is a true duplicate or two genuinely distinct resources; here the engine-specific bodies are mutually exclusive (Postgres transactional DDL vs MySQL auto-commit DDL), so the flag was a false positive.",
+  "dedup": { "flag": "near-dup", "similarity": 0.91, "basis": "shared migration vocabulary + structure" },
+  "a": {
+    "injection_auditor": "GREEN",
+    "repo_safety_auditor": "GREEN",
+    "eval": { "status": "GREEN", "catch_pow_k": 1.0, "clean_pow_k": 1.0 }
+  },
+  "b": {
+    "injection_auditor": "GREEN",
+    "repo_safety_auditor": "GREEN",
+    "eval": { "status": "GREEN", "catch_pow_k": 1.0, "clean_pow_k": 1.0 }
+  }
+}

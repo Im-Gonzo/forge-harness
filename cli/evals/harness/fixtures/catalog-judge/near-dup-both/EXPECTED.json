@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "forge.eval.judge-expected.v1",
+  "aut": "bundle:catalog-judge",
+  "case_class": "conflict-judge",
+  "conflict_kind": "near-dup",
+  "fixture_root": "conflict",
+  "resources": {
+    "a": { "uid": "rule:pg-migrations", "role": "candidate", "contentHash": "sha256:eeee5555distincta00000000000000000000000000000000000000000000ee" },
+    "b": { "uid": "rule:mysql-migrations", "role": "candidate", "contentHash": "sha256:ffff6666distinctb00000000000000000000000000000000000000000000ff" }
+  },
+  "expected": {
+    "verdict": "both",
+    "winning_uid": null,
+    "winning_role": null,
+    "losing_role": null,
+    "human_gate": false,
+    "must_emit": [],
+    "rationale_axes": ["completeness", "correctness", "quality", "security_signal", "eval_signal"],
+    "match": {
+      "any_of": ["both", "near-dup flag was a false positive", "genuinely distinct", "admit both"]
+    }
+  },
+  "notes": "DIFFERENT uids, near-identical SHAPE (the dedup stage's cosine flag fired on shared migration boilerplate). On the merits they are genuinely DISTINCT: A is Postgres-specific (CONCURRENTLY index builds, txn-DDL rollbacks) and B is MySQL-specific (online DDL, no transactional DDL) — neither subsumes the other. The near-dup flag was a FALSE POSITIVE; both are admitted, no uid wins or loses (INV-2 verdict 'both'). This guards against a judge that collapses superficially-similar-but-distinct resources into a single winner."
+}

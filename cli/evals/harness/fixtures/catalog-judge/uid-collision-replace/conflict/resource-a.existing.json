@@ -1,0 +1,11 @@
+{
+  "uid": "agent:retry-helper",
+  "kind": "agent",
+  "role": "existing",
+  "contentHash": "sha256:aaaa1111existing0000000000000000000000000000000000000000000000aa",
+  "title": "retry-helper — retry a failing call",
+  "body": "Wrap any call and retry it when it throws. Loops `while True` and re-invokes on every exception until it succeeds. No backoff, no cap on attempts, no distinction between retryable and fatal errors.",
+  "completeness": "partial — no max-attempts ceiling, no backoff, no idempotency handling",
+  "correctness": "defective — retries non-retryable errors forever (busy-loop on a 400/permission error)",
+  "quality": "thin"
+}

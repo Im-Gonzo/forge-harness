@@ -1,0 +1,14 @@
+{
+  "_note": "Hand-written MOCK NOISY code-reviewer output that mis-flags the already-batched loop (line 52) as an N+1 — a false positive on a clean_trap. gradeReviewerCase(...) MUST FAIL (fp=1). Demonstrates the grader catches a noisy reviewer.",
+  "case": "clean-batched-query",
+  "aut": "agent:code-reviewer",
+  "findings": [
+    {
+      "file": "orders.py",
+      "line": 52,
+      "severity": "MEDIUM",
+      "title": "Possible N+1 query in the order loop",
+      "body": "The loop over orders looks like it could hit the database per iteration."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{FORGE_ROOT}}/hooks/edit-citation-gate.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "Before the first edit/write to a file this session, require the agent to cite the governing rule/spec section. Forces grounding in docs/spec/ before editing. Fail-open.",
+        "id": "forge:edit-citation-gate"
+      }
+    ]
+  }
+}

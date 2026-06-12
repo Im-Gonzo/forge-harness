@@ -1,0 +1,24 @@
+{
+  "_note": "Scaffolding-delta matrix config. Each case runs with its scaffold ON vs OFF, k trials per cell, per model. Deadline-bound: the fable column is only measurable until 2026-06-22.",
+  "models": {
+    "haiku": "claude-haiku-4-5-20251001",
+    "sonnet": "claude-sonnet-4-6",
+    "opus": "claude-opus-4-8",
+    "fable": "claude-fable-5"
+  },
+  "smokeModel": "haiku",
+  "k": 3,
+  "cases": ["invisible-20", "evidence-claims", "invisible-20-hard", "citation-gate", "sop-vs-contract"],
+  "variants": ["on", "off"],
+  "claude": {
+    "bin": "claude",
+    "args": [
+      "--permission-mode", "acceptEdits",
+      "--allowedTools", "Bash(npm:*)", "Bash(node:*)", "Bash(git:*)", "Read", "Edit", "Write", "Grep", "Glob"
+    ],
+    "timeoutMs": 600000
+  },
+  "estCostPerTrialUSD": 0.5,
+  "maxCostUSD": 45,
+  "confirmThresholdTrials": 8
+}

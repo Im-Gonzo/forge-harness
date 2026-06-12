@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/bootstrap/detect-project.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "Detect whether this project has a tailored Forge harness (.claude/.forge.json); if absent, nudge Claude to offer /harness-init. Detect-only: never writes, fail-open.",
+        "id": "forge:detect-project"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/config-protection.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "GLOBAL SAFETY: block edits that MODIFY an existing linter/formatter/tsconfig config (fix the code, not the config). First-time creation is allowed. Fail-open.",
+        "id": "forge:config-protection"
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/secret-scan.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "GLOBAL SAFETY (security module): flag obvious hard-coded secrets in file content or shell commands and block the write; steer to env vars / secret stores. Fail-open.",
+        "id": "forge:secret-scan"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/block-no-verify.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "GLOBAL SAFETY: block git hook-bypass attempts (--no-verify, -c core.hooksPath=). Git/CI hooks must not be skipped. Fail-open.",
+        "id": "forge:block-no-verify"
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/edit-citation-gate.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "PROJECT-GATED (only when .claude/.forge.json exists): on the FIRST edit/write to a file this session, require the agent to cite the rule/spec/BR-ID the change implements. No-op in non-tailored projects. Fail-open.",
+        "id": "forge:edit-citation-gate"
+      },
+      {
+        "matcher": "Task|Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/invoke-telemetry.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "TELEMETRY (opt-in, default OFF): emit-only PreToolUse observer for agent/skill STARTS (agent.invoke/skill.invoke). Records prompt length + sha256 only, NEVER the prompt. No-op when telemetry is off; never denies; fail-open.",
+        "id": "forge:invoke-telemetry"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/loop-gate.mjs\"",
+            "timeout": 5
+          }
+        ],
+        "description": "PROJECT-GATED (loops module): unattended execution (claude -p, nohup claude, crontab, gh workflow run) should reference a registered .claude/loops/ definition. REPORT-ONLY by default (steer to stderr); FORGE_LOOP_GATE=enforce flips to deny. No-op when .claude/loops/ absent or project not forge-tailored. Fail-open.",
+        "id": "forge:loop-gate"
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-typecheck.mjs\"",
+            "timeout": 250
+          }
+        ],
+        "description": "PROJECT-GATED (only when .claude/.forge.json exists): run the project's typecheck (from .forge.json/profile-project.json or detected) once per turn at Stop; report failures so 'done' is backed by a fresh check. No-op if no typecheck resolves. Never blocks; fail-open.",
+        "id": "forge:stop-typecheck"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-loop-candidate.mjs\"",
+            "timeout": 10
+          }
+        ],
+        "description": "PROJECT-GATED (loops module): if the same gate-shaped command (test/lint/typecheck/build) ran >=3 times this turn, emit ONE stderr nudge to codify it as a ratchet/loop (rule of three, loop-discipline.md). Never blocks; once per turn; fail-open.",
+        "id": "forge:stop-loop-candidate"
+      }
+    ]
+  }
+}

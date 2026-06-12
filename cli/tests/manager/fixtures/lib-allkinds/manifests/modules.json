@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for lib-allkinds. Names one component of EACH kind so every discovered artifact is in-module — the scan surface and kind->path resolution (BR-REG-003) are exercised with no orphan/planned noise. componentKinds lists every kind the registry scans.",
+  "componentKinds": ["agents", "skills", "commands", "rules", "hooks", "bundles", "engine", "validators", "meta-tests"],
+  "modules": {
+    "core": {
+      "description": "All-kinds fixture core module: command, engine, validator, meta-test, hook.",
+      "always": true,
+      "components": {
+        "commands": ["harness-doctor"],
+        "engine": ["bootstrap/detect-project"],
+        "validators": ["validate-sample"],
+        "meta-tests": ["sample-meta"],
+        "hooks": ["detect-project@SessionStart"]
+      }
+    },
+    "review": {
+      "description": "All-kinds fixture review module: agent, skill, nested rule.",
+      "components": {
+        "agents": ["code-reviewer"],
+        "skills": ["review-change"],
+        "rules": ["common/citations"]
+      }
+    },
+    "context-bundles": {
+      "description": "All-kinds fixture bundle module.",
+      "components": {
+        "bundles": ["work-module"]
+      }
+    }
+  }
+}

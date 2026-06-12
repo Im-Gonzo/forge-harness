@@ -1,0 +1,18 @@
+{
+  "_note": "Hand-written MOCK catalog-judge output for the uid-collision REPLACE case. The real judge run is a LIVE model call, NOT executed here; this transcript exists only to exercise the deterministic verdict-matcher offline. A MATCHING transcript: emits the EXPECTED verdict 'replace', names the winning uid, cites all axes + both signals, and escalates to a human (T2). The verdict-matcher MUST score this as a calibration PASS.",
+  "case": "uid-collision-replace",
+  "aut": "bundle:catalog-judge",
+  "verdict": "replace",
+  "winning_uid": "agent:retry-helper",
+  "winning_role": "incoming",
+  "losing_role": "existing",
+  "conflict_kind": "uid-collision",
+  "human_review_required": true,
+  "emitted": ["[HUMAN REVIEW REQUIRED]"],
+  "rationale": "Same uid, two bodies. On completeness/correctness/quality the INCOMING dominates: bounded max_attempts + exponential backoff with jitter, idempotency-key handling, and a retryable/fatal split, vs the existing's unbounded busy-loop that retries non-retryable errors forever. Security signals: both GREEN for the incoming; eval signal: incoming GREEN (catch^k=clean^k=1.0) vs existing STALE. Incoming supersedes the existing — verdict REPLACE. Because replace overwrites an already-admitted resource it is a T2, human-applied outcome: [HUMAN REVIEW REQUIRED], winning uid agent:retry-helper (incoming), losing uid agent:retry-helper (existing). No catalog write is performed.",
+  "evidence": {
+    "uids": ["agent:retry-helper", "agent:retry-helper"],
+    "hashes": ["sha256:aaaa1111existing0000000000000000000000000000000000000000000000aa", "sha256:bbbb2222incoming0000000000000000000000000000000000000000000000bb"],
+    "signals_relied_on": ["injection-auditor", "repo-safety-auditor", "eval"]
+  }
+}

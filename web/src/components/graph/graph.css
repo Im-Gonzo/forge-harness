@@ -1,0 +1,130 @@
+/* Graph route theming. Imports the base @xyflow/react stylesheet, then tunes
+ * the canvas to the dark Forge Web theme and defines per-kind node colors. */
+@import "@xyflow/react/dist/style.css";
+
+.forge-graph {
+  /* Per-kind node accent colors (distinct, readable on the dark canvas). */
+  --g-agent: oklch(0.72 0.17 250); /* blue */
+  --g-skill: oklch(0.74 0.17 150); /* green */
+  --g-command: oklch(0.78 0.16 90); /* amber */
+  --g-rule: oklch(0.7 0.16 300); /* violet */
+  --g-hook: oklch(0.75 0.15 40); /* orange */
+  --g-bundle: oklch(0.72 0.15 200); /* teal */
+  --g-validator: oklch(0.68 0.12 20); /* terracotta */
+  --g-meta-test: oklch(0.66 0.1 330); /* magenta-muted */
+  --g-engine: oklch(0.7 0.02 250); /* slate */
+  --g-module: oklch(0.78 0.16 90); /* amber (composition) */
+  --g-profile: oklch(0.72 0.17 250); /* blue (composition) */
+
+  --xy-background-color: var(--background);
+  --xy-edge-stroke: oklch(0.5 0 0);
+  --xy-edge-stroke-selected: var(--foreground);
+  --xy-node-border-default: var(--border);
+  --xy-node-background-color-default: var(--card);
+  height: 100%;
+  width: 100%;
+}
+
+/* Canvas chrome blends into the dark theme. */
+.forge-graph .react-flow__controls {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: hidden;
+}
+.forge-graph .react-flow__controls-button {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+.forge-graph .react-flow__controls-button:hover {
+  background: var(--muted);
+}
+.forge-graph .react-flow__controls-button svg {
+  fill: var(--foreground);
+}
+.forge-graph .react-flow__minimap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.forge-graph .react-flow__attribution {
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.forge-graph .react-flow__background {
+  background: var(--background);
+}
+
+/* Custom node card. */
+.forge-node {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 6px 10px;
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--foreground);
+  min-width: 90px;
+  max-width: 220px;
+  cursor: pointer;
+  transition: box-shadow 0.1s ease, border-color 0.1s ease;
+}
+.forge-node:hover {
+  box-shadow: 0 0 0 1px var(--accent-color, var(--ring));
+}
+.forge-node[data-selected="true"] {
+  border-color: var(--accent-color, var(--ring));
+  box-shadow: 0 0 0 1px var(--accent-color, var(--ring));
+}
+.forge-node[data-orphan="true"] {
+  border-style: dashed;
+}
+.forge-node[data-dangling="true"] {
+  border-color: oklch(0.7 0.19 22);
+  background: oklch(0.7 0.19 22 / 0.12);
+}
+.forge-node[data-droptarget="true"] {
+  border-color: var(--accent-color, var(--ring));
+  box-shadow: 0 0 0 2px var(--accent-color, var(--ring));
+}
+.forge-node__title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.forge-node__kind {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+.forge-node__dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.forge-node .react-flow__handle {
+  width: 6px;
+  height: 6px;
+  background: var(--muted-foreground);
+  border: none;
+}
+
+/* Dangling edge styling (red) is applied per-edge via the data; this is the
+ * selected affordance for the resolve action. */
+.forge-graph .react-flow__edge.dangling .react-flow__edge-path {
+  stroke: oklch(0.7 0.19 22);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+.forge-graph .react-flow__edge.dangling.selected .react-flow__edge-path,
+.forge-graph .react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 2.5;
+}

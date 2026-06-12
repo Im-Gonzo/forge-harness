@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "_note": "Component registry. Components are implemented and validated. A module is a coherent bundle of components that ship together. The composer (bootstrap-harness skill) reads this to know what each module contributes when a profile selects it. Component file layout is defined in docs/ARCHITECTURE.md.",
+  "componentKinds": ["agents", "skills", "commands", "rules", "hooks", "bundles", "workflows", "mcp", "engine", "validators"],
+  "modules": {
+    "core": {
+      "description": "Always installed. The bootstrap engine, harness lifecycle commands, the self-validators, and the constitution scaffold. Every profile includes this.",
+      "always": true,
+      "components": {
+        "commands": ["harness-init", "harness-sync", "harness-doctor"],
+        "skills": ["bootstrap-harness"],
+        "rules": ["prompt-defense-baseline"],
+        "hooks": ["detect-project@SessionStart"],
+        "engine": ["bootstrap/detect-project", "bootstrap/profile-project"],
+        "validators": [
+          "validate-agents", "validate-skills", "validate-commands",
+          "validate-rules", "validate-hooks", "validate-workflows", "validate-workflow-security",
+          "validate-mcp", "validate-xref",
+          "check-unicode-safety", "validate-no-personal-paths", "validate-manifests"
+        ]
+      }
+    },
+    "rules-common": {
+      "description": "Language-agnostic rule packs, scoped by `paths:` globs where applicable.",
+      "components": {
+        "rules": ["coding-style", "security", "testing", "git-workflow", "code-review", "evidence-before-claims"]
+      }
+    },
+    "review": {
+      "description": "Code review with anti-noise discipline and an optional dual independent reviewer.",
+      "components": {
+        "agents": ["code-reviewer", "diff-reviewer"],
+        "skills": ["review-change", "dual-review"]
+      }
+    },
+    "eval": {
+      "description": "Eval-Driven Development: capability vs regression graders, pass@k / pass^k, golden-set scaffold.",
+      "components": {
+        "skills": ["run-eval", "author-eval"],
+        "bundles": ["eval-judge"]
+      }
+    },
+    "memory": {
+      "description": "Confidence + dated-evidence memory with a curation rule and an integrity validator.",
+      "components": {
+        "skills": ["capture-learning", "curate-memory"],
+        "validators": ["validate-memory-integrity"]
+      }
+    },
+    "hooks-quality": {
+      "description": "Quality-gate hooks: fact/citation edit gate, config protection, no-verify block, batched typecheck at Stop.",
+      "components": {
+        "hooks": [
+          "edit-citation-gate@PreToolUse",
+          "config-protection@PreToolUse",
+          "block-no-verify@PreToolUse",
+          "stop-typecheck@Stop"
+        ]
+      }
+    },
+    "context-bundles": {
+      "description": "The tiered-context bundle system: WARM context indexes, the invisible-20% checklist, and bundle-lint with a negative fixture.",
+      "components": {
+        "skills": ["new-bundle", "load-bundle"],
+        "bundles": ["work-module", "walking-skeleton"],
+        "validators": ["validate-bundles"]
+      }
+    },
+    "orchestration": {
+      "description": "Workflow patterns, the T0/T1/T2 autonomy ladder, and decentralized agent handoff routing.",
+      "components": {
+        "skills": ["plan-orchestrate", "orchestrate-delivery"],
+        "rules": ["autonomy-ladder", "agent-handoff-routing", "orchestration-discipline"],
+        "workflows": ["review-changes"]
+      }
+    },
+    "integrations": {
+      "description": "Model Context Protocol (MCP) server configs: the catalog of AVAILABLE MCP servers (mcp/<name>.json snippets) plus their structural validator. Enablement/merge-into-settings is a separate later change.",
+      "components": {
+        "mcp": ["filesystem"],
+        "validators": ["validate-mcp"]
+      }
+    },
+    "python": {
+      "description": "Python / FastAPI stack pack: ruff + mypy + pytest discipline, async patterns.",
+      "components": {
+        "agents": ["python-reviewer"],
+        "rules": ["python-style", "python-testing", "python-security"]
+      }
+    },
+    "typescript": {
+      "description": "TypeScript / Next.js stack pack: tsc --noEmit discipline, eslint, vitest.",
+      "components": {
+        "agents": ["typescript-reviewer"],
+        "rules": ["typescript-style", "typescript-testing", "react-patterns"]
+      }
+    },
+    "database": {
+      "description": "Postgres-focused: expand-contract zero-downtime migrations, migration safety, schema review.",
+      "components": {
+        "agents": ["database-reviewer"],
+        "skills": ["database-migration"],
+        "rules": ["migrations"]
+      }
+    },
+    "security": {
+      "description": "Security review + guardrails: secret scanning, threat-aware review, sensitive-path protection, and the federated-catalog admission auditors (injection + repo safety, ADR-0017 §5a).",
+      "components": {
+        "agents": ["security-reviewer", "injection-auditor", "repo-safety-auditor"],
+        "skills": ["catalog-admit"],
+        "rules": ["security-baseline"],
+        "bundles": ["catalog-judge"],
+        "hooks": ["secret-scan@PreToolUse"]
+      }
+    },
+    "loops": {
+      "description": "Loop authorship: declarative checked-in loop definitions with structural maker/checker split, bounded exits, and tier gating. Forge authors loops; native runtimes (loop command, cron, CI, headless) execute them. See docs/LOOPS-MODULE-DESIGN.md.",
+      "components": {
+        "skills": ["write-loop", "ratchet"],
+        "rules": ["loop-discipline"],
+        "hooks": ["loop-gate@PreToolUse", "stop-loop-candidate@Stop"],
+        "validators": ["validate-loops"]
+      }
+    }
+  }
+}

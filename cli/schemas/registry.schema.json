@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/registry.schema.json",
+  "title": "Forge registry snapshot (forge/.forge/registry.json)",
+  "description": "The generated artifact catalog written by `forge registry build` and validated by `lint/validate-registry.mjs`. Keyed by uid = \"<kind>:<id>\". Field semantics owned by Bundle A (BR-REG/BR-VER); Bundle F ships this layout stub at v0.2. See docs/manager/spec/SPEC-01-registry.md §Data structures.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "VERSION", "generatedAt", "artifacts"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "description": "On-disk schema version for the store's compatibility gate.",
+      "minimum": 1
+    },
+    "VERSION": {
+      "type": "string",
+      "description": "Mirror of forge/VERSION; authority and drift check owned by SPEC-02.",
+      "minLength": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "description": "ISO-8601 timestamp of when the snapshot was generated.",
+      "format": "date-time"
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Every discovered harness artifact, sorted by uid (BR-REG-006).",
+      "items": {
+        "$ref": "#/definitions/artifact"
+      }
+    },
+    "danglingRefs": {
+      "type": "array",
+      "description": "Unresolved dependsOn targets; populated by SPEC-03 (v0.3), allowed empty.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "definitions": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uid",
+        "kind",
+        "id",
+        "path",
+        "contentHash",
+        "revision",
+        "version",
+        "status",
+        "criticality",
+        "owner",
+        "description",
+        "tags",
+        "modules",
+        "dependsOn",
+        "eval",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Stable key, \"<kind>:<id>\".",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "description": "Artifact kind.",
+          "enum": [
+            "agent",
+            "skill",
+            "command",
+            "rule",
+            "hook",
+            "bundle",
+            "workflow",
+            "mcp",
+            "validator",
+            "meta-test",
+            "engine"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "Kind-local identifier.",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "description": "Repo-relative path; for hooks: \"hooks/hooks.json#<id>\".",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "description": "Lowercase 64-hex sha256 of the artifact bytes (ADR-0005).",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "revision": {
+          "type": "integer",
+          "description": "Monotonic revision counter (BR-VER-001).",
+          "minimum": 1
+        },
+        "version": {
+          "type": "string",
+          "description": "Semver intent (BR-VER).",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "description": "Lifecycle status (BR-REG-005).",
+          "enum": ["active", "deprecated", "experimental", "planned"]
+        },
+        "criticality": {
+          "type": "string",
+          "description": "Stored here; semantics owned by Bundle D (ADR-0013).",
+          "enum": ["safety", "compliance", "normal"]
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner from frontmatter.",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Short description from frontmatter."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Free-form tags from frontmatter.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "modules": {
+          "type": "array",
+          "description": "Reverse-index of manifests/modules.json (module -> uid).",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "dependsOn": {
+          "type": "array",
+          "description": "Dependency uids; populated by SPEC-03 (v0.3), allowed empty.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "eval": {
+          "type": "object",
+          "description": "Eval-linkage slot; payload owned by Bundle E. Allowed empty at v0.2.",
+          "additionalProperties": true
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO-8601 creation timestamp; preserved across unchanged builds (BR-REG-006).",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO-8601 last-change timestamp.",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "object",
+          "description": "OPTIONAL federated-catalog provenance (ADR-0017). Present only on artifacts ADMITTED from an external source; local/owned artifacts omit it (not in `required`). Records the source id + the exact upstream commit the bytes were synced from, so drift vs upstream is answerable alongside contentHash (ADR-0005).",
+          "additionalProperties": false,
+          "required": ["sourceId", "repoUrl", "ref", "commit", "importedAt"],
+          "properties": {
+            "sourceId": {
+              "type": "string",
+              "description": "The source id this artifact was admitted from (-> manifests/sources.json#sources[].id).",
+              "minLength": 1
+            },
+            "repoUrl": {
+              "type": "string",
+              "description": "Clone URL (git) or filesystem path (local) of the originating source.",
+              "minLength": 1
+            },
+            "ref": {
+              "type": "string",
+              "description": "Branch/tag/commit the source tracks (mirror of the source's `ref`).",
+              "minLength": 1
+            },
+            "commit": {
+              "type": "string",
+              "description": "Exact upstream commit the admitted bytes were synced from (from .forge/sources.lock).",
+              "minLength": 1
+            },
+            "importedAt": {
+              "type": "string",
+              "description": "ISO-8601 timestamp of when the artifact was admitted into the library.",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    }
+  }
+}

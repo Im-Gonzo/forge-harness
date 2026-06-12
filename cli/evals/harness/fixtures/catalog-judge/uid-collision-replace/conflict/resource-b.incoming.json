@@ -1,0 +1,11 @@
+{
+  "uid": "agent:retry-helper",
+  "kind": "agent",
+  "role": "incoming",
+  "contentHash": "sha256:bbbb2222incoming0000000000000000000000000000000000000000000000bb",
+  "title": "retry-helper — retry a failing call with bounded exponential backoff",
+  "body": "Wrap any call and retry it on RETRYABLE errors only (timeouts, 429, 5xx). Bounded by max_attempts; waits with exponential backoff + full jitter between tries; honors an idempotency key so a retried write is not duplicated; raises immediately on non-retryable errors (4xx other than 429, auth failures).",
+  "completeness": "complete — max_attempts ceiling, backoff+jitter, idempotency-key handling, retryable/fatal split",
+  "correctness": "correct — never busy-loops; only retries retryable classes",
+  "quality": "strong"
+}

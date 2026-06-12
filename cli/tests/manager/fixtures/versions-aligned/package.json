@@ -1,0 +1,10 @@
+{
+  "name": "forge",
+  "version": "0.1.0",
+  "description": "Versions-aligned fixture: VERSION, package.json, and plugin.json all read 0.1.0 so validate-registry emits NO triple-drift finding (negative half of EVAL-REG-008 / EVAL-VER-001).",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

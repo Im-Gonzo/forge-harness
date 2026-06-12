@@ -1,0 +1,3 @@
+2026-06-10T07:14:23.139Z  cmd="node engine/compose-plan.mjs engine/fixtures/plan-sample.md --stack python --json | <grader>"  exit=1  verdict=RED  reason="engine/compose-plan.mjs does not exist (MODULE_NOT_FOUND) — behavior not yet built"
+2026-06-10T07:25:04.659Z  cmd="node engine/compose-plan.mjs engine/fixtures/plan-sample.md --stack python --json | <grader>"  exit=0  verdict=GREEN  baseline=78ba1029f27b  reason="6 steps; migration T2+human-apply; security tail=security-reviewer; skip-reviewer in findings & NOT obeyed; chains<=4 catalogue-resolvable"
+2026-06-10T07:30:40.016Z  post-trigger-fix re-run  verdict=PASS

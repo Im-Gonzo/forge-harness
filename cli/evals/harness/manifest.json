@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "forge.eval.manifest.v1",
+  "_note": "SPEC-07 §Golden-set layout: maps each behavioral case to its artifact-under-test (AUT) + the aut_hash pinned at authoring (registry contentHash). The `artifacts[]` array is the coverage roll-up forge eval-harness --report / forge status read: an artifact with a golden set counts toward coverage but stays grade U / status UNEVALUATED until a LIVE reviewer run scores it (a model call, NOT run here). aut_hash values are the live registry contentHashes; if a reviewer prompt is edited, status computes STALE (BR-EVAL-013).",
+  "cases": [
+    {
+      "id": "ssrf-metadata-fetch",
+      "aut": "agent:security-reviewer",
+      "aut_kind": "agent",
+      "case_class": "planted-defect",
+      "aut_hash": "sha256:64e54eb80fdaf20ee96c5f3518b9aa293c5e4d2638a79661ca6730c732531c3a",
+      "case": "cases/security-reviewer/ssrf-metadata-fetch.case.md",
+      "fixture": "fixtures/security-reviewer/ssrf-metadata-fetch",
+      "expected": "fixtures/security-reviewer/ssrf-metadata-fetch/EXPECTED.json",
+      "transcripts": {
+        "catch": "transcripts/security-reviewer/ssrf-metadata-fetch.catch.json",
+        "miss": "transcripts/security-reviewer/ssrf-metadata-fetch.miss.json"
+      },
+      "verifies": "EVAL-EVAL-001"
+    },
+    {
+      "id": "clean-allowlisted-fetch",
+      "aut": "agent:security-reviewer",
+      "aut_kind": "agent",
+      "case_class": "clean",
+      "aut_hash": "sha256:64e54eb80fdaf20ee96c5f3518b9aa293c5e4d2638a79661ca6730c732531c3a",
+      "case": "cases/security-reviewer/clean-allowlisted-fetch.case.md",
+      "fixture": "fixtures/security-reviewer/clean-allowlisted-fetch",
+      "expected": "fixtures/security-reviewer/clean-allowlisted-fetch/EXPECTED.json",
+      "transcripts": {
+        "clean": "transcripts/security-reviewer/clean-allowlisted-fetch.clean.json",
+        "noisy": "transcripts/security-reviewer/clean-allowlisted-fetch.noisy.json"
+      },
+      "verifies": "EVAL-EVAL-002"
+    },
+    {
+      "id": "nplus1-missing-index",
+      "aut": "agent:code-reviewer",
+      "aut_kind": "agent",
+      "case_class": "planted-defect",
+      "aut_hash": "sha256:6a19d98964cc8bee60f1b758872bf1a0aed81b14e9fb8654359f3a12e9138ab1",
+      "case": "cases/code-reviewer/nplus1-missing-index.case.md",
+      "fixture": "fixtures/code-reviewer/nplus1-missing-index",
+      "expected": "fixtures/code-reviewer/nplus1-missing-index/EXPECTED.json",
+      "transcripts": {
+        "catch": "transcripts/code-reviewer/nplus1-missing-index.catch.json",
+        "miss": "transcripts/code-reviewer/nplus1-missing-index.miss.json"
+      },
+      "verifies": "EVAL-EVAL-001"
+    },
+    {
+      "id": "clean-batched-query",
+      "aut": "agent:code-reviewer",
+      "aut_kind": "agent",
+      "case_class": "clean",
+      "aut_hash": "sha256:6a19d98964cc8bee60f1b758872bf1a0aed81b14e9fb8654359f3a12e9138ab1",
+      "case": "cases/code-reviewer/clean-batched-query.case.md",
+      "fixture": "fixtures/code-reviewer/clean-batched-query",
+      "expected": "fixtures/code-reviewer/clean-batched-query/EXPECTED.json",
+      "transcripts": {
+        "clean": "transcripts/code-reviewer/clean-batched-query.clean.json",
+        "noisy": "transcripts/code-reviewer/clean-batched-query.noisy.json"
+      },
+      "verifies": "EVAL-EVAL-002"
+    }
+  ],
+  "_judge_note": "JUDGE CALIBRATION sets live in `judge_cases[]`, kept SEPARATE from the reviewer `cases[]` above because a judge is NOT graded by gradeReviewerCase (findings vs EXPECTED defects/clean_traps). A judge emits a CLOSED verdict {keep|replace|both|quarantine} and is graded by VERDICT-MATCH against EXPECTED.json#expected.verdict; the per-case PASS/FAIL vector is fed to the harness `judgeGate` (manager/eval-harness.mjs, BR-EVAL-020) to compute judge_cal = pass^k. A judge with judge_cal < 1.00 is PULLED from the admission gate and advises only (catalog-judge INV-5). selftest.mjs proves the verdict-matcher scores the mock MATCH transcripts PASS and MISS transcripts FAIL, and that the resulting all-PASS calibration vector makes judgeGate({calibration}).gates === true at judge_cal === 1.00. The LIVE judge run across k worktrees is a model call, NOT executed here.",
+  "judge_cases": [
+    {
+      "id": "uid-collision-replace",
+      "aut": "bundle:catalog-judge",
+      "aut_kind": "bundle",
+      "case_class": "conflict-judge",
+      "conflict_kind": "uid-collision",
+      "expected_verdict": "replace",
+      "aut_hash": "sha256:f78af06f31379e0ce346891201f9b8fd2667eb5ad17ea857ca438bb23df4ab43",
+      "case": "cases/catalog-judge/uid-collision-replace.case.md",
+      "fixture": "fixtures/catalog-judge/uid-collision-replace",
+      "expected": "fixtures/catalog-judge/uid-collision-replace/EXPECTED.json",
+      "transcripts": {
+        "match": "transcripts/catalog-judge/uid-collision-replace.match.json",
+        "miss": "transcripts/catalog-judge/uid-collision-replace.miss.json"
+      },
+      "verifies": "EVAL-EVAL-014"
+    },
+    {
+      "id": "uid-collision-keep",
+      "aut": "bundle:catalog-judge",
+      "aut_kind": "bundle",
+      "case_class": "conflict-judge",
+      "conflict_kind": "uid-collision",
+      "expected_verdict": "keep",
+      "aut_hash": "sha256:f78af06f31379e0ce346891201f9b8fd2667eb5ad17ea857ca438bb23df4ab43",
+      "case": "cases/catalog-judge/uid-collision-keep.case.md",
+      "fixture": "fixtures/catalog-judge/uid-collision-keep",
+      "expected": "fixtures/catalog-judge/uid-collision-keep/EXPECTED.json",
+      "transcripts": {
+        "match": "transcripts/catalog-judge/uid-collision-keep.match.json",
+        "miss": "transcripts/catalog-judge/uid-collision-keep.miss.json"
+      },
+      "verifies": "EVAL-EVAL-014"
+    },
+    {
+      "id": "near-dup-both",
+      "aut": "bundle:catalog-judge",
+      "aut_kind": "bundle",
+      "case_class": "conflict-judge",
+      "conflict_kind": "near-dup",
+      "expected_verdict": "both",
+      "aut_hash": "sha256:f78af06f31379e0ce346891201f9b8fd2667eb5ad17ea857ca438bb23df4ab43",
+      "case": "cases/catalog-judge/near-dup-both.case.md",
+      "fixture": "fixtures/catalog-judge/near-dup-both",
+      "expected": "fixtures/catalog-judge/near-dup-both/EXPECTED.json",
+      "transcripts": {
+        "match": "transcripts/catalog-judge/near-dup-both.match.json",
+        "miss": "transcripts/catalog-judge/near-dup-both.miss.json"
+      },
+      "verifies": "EVAL-EVAL-014"
+    },
+    {
+      "id": "flagged-injection-quarantine",
+      "aut": "bundle:catalog-judge",
+      "aut_kind": "bundle",
+      "case_class": "conflict-judge",
+      "conflict_kind": "uid-collision",
+      "expected_verdict": "quarantine",
+      "aut_hash": "sha256:f78af06f31379e0ce346891201f9b8fd2667eb5ad17ea857ca438bb23df4ab43",
+      "case": "cases/catalog-judge/flagged-injection-quarantine.case.md",
+      "fixture": "fixtures/catalog-judge/flagged-injection-quarantine",
+      "expected": "fixtures/catalog-judge/flagged-injection-quarantine/EXPECTED.json",
+      "transcripts": {
+        "match": "transcripts/catalog-judge/flagged-injection-quarantine.match.json",
+        "miss": "transcripts/catalog-judge/flagged-injection-quarantine.miss.json"
+      },
+      "verifies": "EVAL-EVAL-014"
+    }
+  ],
+  "artifacts": [
+    {
+      "uid": "agent:security-reviewer",
+      "hasGoldenSet": true,
+      "cases": ["ssrf-metadata-fetch", "clean-allowlisted-fetch"],
+      "eval": {
+        "grade": "U",
+        "status": "UNEVALUATED",
+        "health": null,
+        "k": 5,
+        "graded_against_hash": "sha256:64e54eb80fdaf20ee96c5f3518b9aa293c5e4d2638a79661ca6730c732531c3a"
+      }
+    },
+    {
+      "uid": "agent:code-reviewer",
+      "hasGoldenSet": true,
+      "cases": ["nplus1-missing-index", "clean-batched-query"],
+      "eval": {
+        "grade": "U",
+        "status": "UNEVALUATED",
+        "health": null,
+        "k": 5,
+        "graded_against_hash": "sha256:6a19d98964cc8bee60f1b758872bf1a0aed81b14e9fb8654359f3a12e9138ab1"
+      }
+    },
+    {
+      "uid": "bundle:catalog-judge",
+      "hasGoldenSet": true,
+      "cases": ["uid-collision-replace", "uid-collision-keep", "near-dup-both", "flagged-injection-quarantine"],
+      "eval": {
+        "grade": "U",
+        "status": "UNEVALUATED",
+        "health": null,
+        "k": 4,
+        "judge_cal": null,
+        "gates": false,
+        "graded_against_hash": "sha256:f78af06f31379e0ce346891201f9b8fd2667eb5ad17ea857ca438bb23df4ab43"
+      }
+    }
+  ]
+}

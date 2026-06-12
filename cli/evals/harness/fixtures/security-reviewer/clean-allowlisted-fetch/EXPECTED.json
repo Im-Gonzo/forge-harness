@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "forge.eval.expected.v1",
+  "aut": "agent:security-reviewer",
+  "case_class": "clean",
+  "fixture_root": "code",
+  "defects": [],
+  "clean_lines": [33, 39, 60],
+  "clean_traps": [
+    {
+      "id": "trap-allowlisted-fetch",
+      "class": "SSRF",
+      "file": "app.py",
+      "line": 62,
+      "reason": "Outbound fetch is confined to a fixed host allowlist (_is_allowed) checked before the request — not SSRF. Flagging it is a false positive."
+    },
+    {
+      "id": "trap-stripe-pk",
+      "class": "SECRET",
+      "file": "app.py",
+      "line": 27,
+      "reason": "A publishable Stripe pk_ key is designed to be public (client-side). On the reviewer's do-NOT-report list."
+    },
+    {
+      "id": "trap-md5-cache-key",
+      "class": "WEAK_CRYPTO",
+      "file": "app.py",
+      "line": 51,
+      "reason": "MD5 used as an idempotency cache key, not a security primitive. Flagging non-crypto MD5 is security theater per the reviewer's do-NOT-report list."
+    }
+  ]
+}

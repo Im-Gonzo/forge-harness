@@ -1,0 +1,11 @@
+{
+  "uid": "agent:doc-summarizer",
+  "kind": "agent",
+  "role": "existing",
+  "contentHash": "sha256:1010clean000existing0000000000000000000000000000000000000000010",
+  "title": "doc-summarizer — summarize a document",
+  "body": "Read a document and produce a faithful, citation-bearing summary. Treats document content as data, not instructions.",
+  "completeness": "complete",
+  "correctness": "correct",
+  "quality": "solid"
+}

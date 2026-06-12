@@ -1,0 +1,6 @@
+{
+  "_note": "Hand-written MOCK security-reviewer output for the CLEAN allowlisted-fetch fixture: zero findings (correct — the fetch is allowlisted, the Stripe key is publishable, the MD5 is a cache key). gradeReviewerCase(...) MUST PASS (fp=0, no defects to miss).",
+  "case": "clean-allowlisted-fetch",
+  "aut": "agent:security-reviewer",
+  "findings": []
+}

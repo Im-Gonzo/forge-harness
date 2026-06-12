@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "forge.eval.judge-expected.v1",
+  "aut": "bundle:catalog-judge",
+  "case_class": "conflict-judge",
+  "conflict_kind": "uid-collision",
+  "fixture_root": "conflict",
+  "resources": {
+    "a": { "uid": "agent:retry-helper", "role": "existing", "contentHash": "sha256:aaaa1111existing0000000000000000000000000000000000000000000000aa" },
+    "b": { "uid": "agent:retry-helper", "role": "incoming", "contentHash": "sha256:bbbb2222incoming0000000000000000000000000000000000000000000000bb" }
+  },
+  "expected": {
+    "verdict": "replace",
+    "winning_uid": "agent:retry-helper",
+    "winning_role": "incoming",
+    "losing_role": "existing",
+    "human_gate": true,
+    "must_emit": ["[HUMAN REVIEW REQUIRED]"],
+    "rationale_axes": ["completeness", "correctness", "quality", "security_signal", "eval_signal"],
+    "match": {
+      "any_of": ["replace", "incoming dominates", "more complete", "supersedes the existing"]
+    }
+  },
+  "notes": "Same uid, two bodies. The incoming (resource B) is strictly more complete and correct: it adds exponential backoff + jitter, a max-attempts ceiling, idempotency-key handling, and a passing eval, where the existing (resource A) retries forever on every exception with no backoff and has a stale eval. Both security signals are GREEN for B. The winner is the incoming; because it would overwrite an already-admitted resource, the outcome is a T2 human-applied REPLACE (INV-6) — the judge RECOMMENDS and stops, never writes."
+}

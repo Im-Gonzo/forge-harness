@@ -1,0 +1,20 @@
+{
+  "forgeVersion": "0.1.0",
+  "profile": "review",
+  "modules": [
+    "review"
+  ],
+  "generatedAt": "2026-06-01T00:00:00.000Z",
+  "facts": "profile-project.json",
+  "files": [
+    {
+      "path": ".claude/agents/code-reviewer.md",
+      "checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "userEditable": true
+    }
+  ],
+  "provenance": {
+    "registrySchema": "forge.registry.v1",
+    "sourceRev": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

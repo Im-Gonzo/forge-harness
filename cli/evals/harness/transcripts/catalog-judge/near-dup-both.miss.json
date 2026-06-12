@@ -1,0 +1,10 @@
+{
+  "_note": "Hand-written MOCK catalog-judge output that MISSES the BOTH case: it treats the high similarity as a true duplicate and collapses the two distinct engine-specific rules into a single KEEP winner, dropping the other. The verdict-matcher MUST score this as a calibration FAIL. Demonstrates the matcher catches a judge that over-trusts the dedup similarity score over the merits.",
+  "case": "near-dup-both",
+  "aut": "bundle:catalog-judge",
+  "verdict": "keep",
+  "winning_uid": "rule:pg-migrations",
+  "conflict_kind": "near-dup",
+  "human_review_required": false,
+  "rationale": "Similarity was 0.91 so I treated them as duplicates and kept the Postgres one. (Wrong: the MySQL rule is not redundant — it encodes the opposite DDL transactionality; dropping it loses real coverage. Over-trusting the similarity score is the failure this case guards against.)"
+}

@@ -1,0 +1,14 @@
+{
+  "_note": "Hand-written MOCK code-reviewer output that catches ONLY the N+1 and MISSES the missing index. gradeReviewerCase(...) MUST FAIL (fn=1 for missing-index-1). Demonstrates the grader requires EVERY planted defect to be caught.",
+  "case": "nplus1-missing-index",
+  "aut": "agent:code-reviewer",
+  "findings": [
+    {
+      "file": "orders.py",
+      "line": 36,
+      "severity": "HIGH",
+      "title": "N+1 query per order in the loop",
+      "body": "One query per order inside the loop — batch it. (Reviewer stopped here and never looked at the schema, so the missing index on line_items.order_id was missed.)"
+    }
+  ]
+}

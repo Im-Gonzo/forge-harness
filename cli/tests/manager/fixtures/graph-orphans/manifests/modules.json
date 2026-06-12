@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for graph-orphans. Only router-reviewer is in a module. routed-reviewer is in NO module but reachable via router's routes-to edge (NOT an orphan). lonely-reviewer is in NO module AND has zero inbound edges (the ONLY orphan). Exercises BR-DEP-006.",
+  "componentKinds": ["agents"],
+  "modules": {
+    "review": {
+      "description": "Names only the router; the routed and lonely agents are module-less.",
+      "components": {
+        "agents": ["router-reviewer"]
+      }
+    }
+  }
+}

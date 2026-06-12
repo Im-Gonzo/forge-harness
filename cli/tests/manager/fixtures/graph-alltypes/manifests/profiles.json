@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "_note": "FIXTURE manifest for graph-alltypes. Each profile->module pairing is a `selects` edge (profile selects module). The eval-profile selects the eval + rules-common modules.",
+  "defaultProfile": "eval-profile",
+  "profiles": {
+    "eval-profile": {
+      "description": "Selects the eval and rules-common modules (selects edges).",
+      "modules": ["eval", "rules-common"]
+    }
+  }
+}

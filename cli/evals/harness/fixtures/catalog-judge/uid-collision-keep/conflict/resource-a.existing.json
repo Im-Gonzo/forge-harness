@@ -1,0 +1,11 @@
+{
+  "uid": "skill:csv-export",
+  "kind": "skill",
+  "role": "existing",
+  "contentHash": "sha256:cccc3333existing0000000000000000000000000000000000000000000000cc",
+  "title": "csv-export — stream a table to RFC-4180 CSV",
+  "body": "Stream rows from the query cursor straight to the output (constant memory). Quote and escape every field per RFC-4180 (embedded commas, quotes, and newlines handled). Emits a header row.",
+  "completeness": "complete — streaming, header row, full RFC-4180 quoting/escaping",
+  "correctness": "correct — fields with commas/quotes/newlines round-trip",
+  "quality": "strong"
+}

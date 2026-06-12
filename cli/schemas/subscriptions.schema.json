@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forge.local/schemas/subscriptions.schema.json",
+  "title": "Forge slice subscriptions (.forge/subscriptions.json)",
+  "description": "Per-active-root project state: which catalog SLICES the project has opted into. A SLICE is a named group of ONE source's catalog records; in v1 a slice is one source's records of a single registry kind, with slice id \"<sourceId>/<kind>\" (ADR-0018). New slices default UNSUBSCRIBED (opt-in, consistent with sources defaulting untrusted, ADR-0017). The catalog READ-VIEW = library-local records (source === null, always present) UNION records whose slice id is listed in `subscribed`. Owned by manager/slices.mjs (forge slice list|subscribe|unsubscribe). Writes are ADDITIVE and never destructive (writeJsonAtomic via manager/lib/store.mjs); subscribing/unsubscribing only adds/removes one slice id. This file lives UNDER the active project root, not in the git-tracked library, and is created on first --apply.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "subscribed"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "description": "On-disk schema tag for this file.",
+      "enum": ["forge.subscriptions.v1"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Schema version.",
+      "minimum": 1
+    },
+    "_note": {
+      "type": "string",
+      "description": "Free-form authoring note; ignored by the slice operator."
+    },
+    "subscribed": {
+      "type": "array",
+      "description": "The slice ids this project has opted into. Each id is \"<sourceId>/<kind>\" (forward slash; resource uids use \"<kind>:<id>\", so \"/\" avoids ambiguity). An absent or unlisted slice is UNSUBSCRIBED. Order is not significant; ids SHOULD be unique (the operator dedups on write).",
+      "items": {
+        "$ref": "#/definitions/sliceId"
+      },
+      "uniqueItems": true
+    }
+  },
+  "definitions": {
+    "sliceId": {
+      "type": "string",
+      "description": "A slice id \"<sourceId>/<kind>\": the source id (manifests/sources.json#sources[].id) and the singular registry kind (agent|skill|command|rule|hook|bundle|validator|mcp|meta-test|engine), joined by a single forward slash.",
+      "pattern": "^[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9-]*$",
+      "minLength": 3
+    }
+  }
+}

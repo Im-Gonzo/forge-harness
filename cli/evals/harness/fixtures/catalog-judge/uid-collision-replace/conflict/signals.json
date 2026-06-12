@@ -1,0 +1,13 @@
+{
+  "_note": "Deterministically-collected admission signals attached to the pair (ADR-0017 §5a + the resource eval result). The judge reasons OVER these; it does not re-run them. Both signals GREEN for the incoming, so a winner is permissible (INV-4).",
+  "a": {
+    "injection_auditor": "GREEN",
+    "repo_safety_auditor": "GREEN",
+    "eval": { "status": "STALE", "catch_pow_k": null, "note": "graded against an older contentHash" }
+  },
+  "b": {
+    "injection_auditor": "GREEN",
+    "repo_safety_auditor": "GREEN",
+    "eval": { "status": "GREEN", "catch_pow_k": 1.0, "clean_pow_k": 1.0 }
+  }
+}

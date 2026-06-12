@@ -1,0 +1,11 @@
+{
+  "uid": "rule:pg-migrations",
+  "kind": "rule",
+  "role": "candidate",
+  "contentHash": "sha256:eeee5555distincta00000000000000000000000000000000000000000000ee",
+  "title": "pg-migrations — safe Postgres schema migrations",
+  "body": "Postgres-specific migration rule: build indexes with CREATE INDEX CONCURRENTLY (no table lock), wrap DDL in a transaction so a failed migration rolls back atomically (Postgres has transactional DDL), and add NOT NULL columns in two steps to avoid a full rewrite.",
+  "engine_specific": "postgres",
+  "completeness": "complete for Postgres",
+  "correctness": "correct for Postgres"
+}

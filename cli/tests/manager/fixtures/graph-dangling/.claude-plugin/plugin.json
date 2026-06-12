@@ -1,0 +1,5 @@
+{
+  "name": "graph-dangling-fixture",
+  "version": "0.1.0",
+  "description": "FIXTURE plugin manifest. Version aligned with VERSION and package.json so the only validate-registry advisory is the dangling foo-reviewer ref (EVAL-DEP-003)."
+}

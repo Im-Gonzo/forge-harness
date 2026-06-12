@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "forge.eval.expected.v1",
+  "aut": "agent:code-reviewer",
+  "case_class": "clean",
+  "fixture_root": "code",
+  "defects": [],
+  "clean_lines": [50, 22],
+  "clean_traps": [
+    {
+      "id": "trap-batched-loop",
+      "class": "N_PLUS_ONE",
+      "file": "orders.py",
+      "line": 52,
+      "reason": "The loop body does only a dict lookup; all DB work was batched into one GROUP BY before the loop. Not an N+1 — flagging it is a false positive."
+    },
+    {
+      "id": "trap-fixed-cardinality-enum",
+      "class": "N_PLUS_ONE",
+      "file": "orders.py",
+      "line": 62,
+      "reason": "Fixed-cardinality loop over a small enum (OrderStatus). On the reviewer's do-NOT-report list ('N+1 query on a fixed-cardinality loop iterating a small enum')."
+    },
+    {
+      "id": "trap-index-present",
+      "class": "MISSING_INDEX",
+      "file": "schema.sql",
+      "line": 22,
+      "reason": "line_items.order_id IS indexed here (idx_line_items_order). Flagging a missing index is a false positive."
+    }
+  ]
+}

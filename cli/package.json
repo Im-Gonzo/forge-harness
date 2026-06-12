@@ -1,0 +1,19 @@
+{
+  "name": "forge",
+  "version": "0.2.3",
+  "description": "A personal Claude Code harness that installs once globally and tailors itself to every project.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "forge": "./bin/forge.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "validate": "node bin/forge.mjs validate",
+    "profile": "node bootstrap/profile-project.mjs",
+    "test": "node tests/run-meta.mjs",
+    "test:unit": "node --test 'tests/manager/*.test.mjs'"
+  }
+}

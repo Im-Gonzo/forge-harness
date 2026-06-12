@@ -1,0 +1,6 @@
+{
+  "_note": "Hand-written MOCK code-reviewer output for the CLEAN batched-query fixture: zero findings (correct — the query is batched once, the enum loop is fixed-cardinality, the index is present). gradeReviewerCase(...) MUST PASS.",
+  "case": "clean-batched-query",
+  "aut": "agent:code-reviewer",
+  "findings": []
+}

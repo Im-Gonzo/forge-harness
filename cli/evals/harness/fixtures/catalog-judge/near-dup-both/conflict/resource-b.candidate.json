@@ -1,0 +1,11 @@
+{
+  "uid": "rule:mysql-migrations",
+  "kind": "rule",
+  "role": "candidate",
+  "contentHash": "sha256:ffff6666distinctb00000000000000000000000000000000000000000000ff",
+  "title": "mysql-migrations — safe MySQL schema migrations",
+  "body": "MySQL-specific migration rule: use ALGORITHM=INPLACE / online DDL to avoid blocking writes, and DO NOT rely on transactional DDL (MySQL auto-commits DDL — a failed multi-step migration does not roll back, so write a forward-only compensating step). Prefer pt-online-schema-change for large tables.",
+  "engine_specific": "mysql",
+  "completeness": "complete for MySQL",
+  "correctness": "correct for MySQL"
+}

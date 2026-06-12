@@ -1,0 +1,9 @@
+{
+  "_note": "EXAMPLE MCP server config (catalog entry only; not auto-installed). An mcp component lists an AVAILABLE Model Context Protocol server. Enablement/merge-into-settings is a separate later change.",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    }
+  }
+}

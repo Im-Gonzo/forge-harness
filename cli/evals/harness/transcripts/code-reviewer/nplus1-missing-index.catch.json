@@ -1,0 +1,21 @@
+{
+  "_note": "Hand-written MOCK code-reviewer output for the planted N+1 + missing-index fixture. Catches BOTH defects: the N+1 at orders.py:36 and the missing index at schema.sql:19, each at MEDIUM, each named via the closed phrase set. gradeReviewerCase(...) MUST PASS.",
+  "case": "nplus1-missing-index",
+  "aut": "agent:code-reviewer",
+  "findings": [
+    {
+      "file": "orders.py",
+      "line": 36,
+      "severity": "HIGH",
+      "title": "N+1 query: one DB round trip per order inside the loop",
+      "body": "summarize_orders issues one session.execute per order to count line items. With N orders that is N+1 queries. Fetch the counts in a single batched GROUP BY query before the loop (query per order is the problem)."
+    },
+    {
+      "file": "schema.sql",
+      "line": 19,
+      "severity": "MEDIUM",
+      "title": "Missing index on line_items.order_id",
+      "body": "line_items.order_id is the hot filter column for the per-order count but has no index, so each lookup is a full table scan. Add an index on order_id (index on line_items.order_id)."
+    }
+  ]
+}
